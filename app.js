@@ -8,15 +8,15 @@ import {
   onDisconnect
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-/* FIREBASE */
+/* 🔥 FIREBASE */
 const firebaseConfig = {
-   apiKey: "AIzaSyDqpzbGP9NIEpqt19ZD8F63Hb9U81XNmj4",
-   authDomain: "chat-1fcbc.firebaseapp.com",
-   databaseURL: "https://chat-1fcbc-default-rtdb.europe-west1.firebasedatabase.app",
-   projectId: "chat-1fcbc",
-   storageBucket: "chat-1fcbc.firebasestorage.app",
-   messagingSenderId: "1052129961309",
-   appId: "1:1052129961309:web:557082ecbc6bae0e69f4b4"
+  apiKey: "AIzaSyDqpzbGP9NIEpqt19ZD8F63Hb9U81XNmj4",
+  authDomain: "chat-1fcbc.firebaseapp.com",
+  databaseURL: "https://chat-1fcbc-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "chat-1fcbc",
+  storageBucket: "chat-1fcbc.firebasestorage.app",
+  messagingSenderId: "1052129961309",
+  appId: "1:1052129961309:web:557082ecbc6bae0e69f4b4"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -35,7 +35,7 @@ window.joinRoom = function () {
   if (!roomId || !name) return alert("Eksik bilgi");
 
   document.getElementById("login").style.display = "none";
-  document.getElementById("chatApp").style.display = "block";
+  document.getElementById("chatApp").style.display = "flex";
 
   document.getElementById("roomText").innerText = "🏠 " + roomId;
 
@@ -43,9 +43,10 @@ window.joinRoom = function () {
   listenMessages();
   listenUsers();
   listenTyping();
+  initTyping();
 };
 
-/* 💬 SEND MESSAGE */
+/* 💬 SEND */
 window.sendMessage = function () {
 
   const msg = document.getElementById("msg").value;
@@ -61,41 +62,11 @@ window.sendMessage = function () {
 
   setTyping(false);
   cleanupMessages();
-  push(ref(db, "rooms/" + roomId + "/messages"), {
-  name,
-  text: msg,
-  time: Date.now(),
-  owner: name
-});
 };
 
 /* 📥 MESSAGES */
 function listenMessages() {
-  const div = document.createElement("div");
 
-div.classList.add("message");
-div.setAttribute("data-id", id);
-
-if (m.name === name) {
-  div.style.marginLeft = "auto";
-  div.style.background = "#3b82f6";
-}
-
-/* LONG PRESS */
-let pressTimer;
-
-div.addEventListener("mousedown", () => {
-  pressTimer = setTimeout(() => {
-    showMessageOptions(id, m);
-  }, 600);
-});
-
-div.addEventListener("mouseup", () => clearTimeout(pressTimer));
-div.addEventListener("mouseleave", () => clearTimeout(pressTimer));
-
-div.innerHTML = `<b>${m.name}</b><br>${m.text}`;
-
-box.appendChild(div);
   onValue(ref(db, "rooms/" + roomId + "/messages"), (snap) => {
 
     const data = snap.val();
@@ -117,6 +88,17 @@ box.appendChild(div);
         div.style.background = "#3b82f6";
       }
 
+      let pressTimer;
+
+      div.addEventListener("mousedown", () => {
+        pressTimer = setTimeout(() => {
+          showMessageOptions(id, m);
+        }, 600);
+      });
+
+      div.addEventListener("mouseup", () => clearTimeout(pressTimer));
+      div.addEventListener("mouseleave", () => clearTimeout(pressTimer));
+
       div.innerHTML = `<b>${m.name}</b><br>${m.text}`;
 
       box.appendChild(div);
@@ -126,23 +108,16 @@ box.appendChild(div);
   });
 }
 
-/* 👥 ONLINE */
+/* 👤 USERS */
 function setOnline() {
 
   const userRef = ref(db, "rooms/" + roomId + "/users/" + name);
 
-  set(userRef, {
-    name,
-    online: true
-  });
+  set(userRef, { name, online: true });
 
-  onDisconnect(userRef).set({
-    name,
-    online: false
-  });
+  onDisconnect(userRef).set({ name, online: false });
 }
 
-/* 👀 USERS */
 function listenUsers() {
 
   onValue(ref(db, "rooms/" + roomId + "/users"), (snap) => {
@@ -153,29 +128,26 @@ function listenUsers() {
     box.innerHTML = "";
 
     for (let id in data) {
-
       const u = data[id];
 
-      const div = document.createElement("div");
-
-      div.innerHTML = u.online
-        ? "🟢 " + u.name
-        : "⚫ " + u.name;
-
-      box.appendChild(div);
+      box.innerHTML += u.online
+        ? "🟢 " + u.name + " "
+        : "⚫ " + u.name + " ";
     }
   });
 }
 
 /* ✍ TYPING */
-document.getElementById("msg").addEventListener("input", () => {
+function initTyping() {
 
-  setTyping(true);
+  const input = document.getElementById("msg");
 
-  setTimeout(() => {
-    setTyping(false);
-  }, 1200);
-});
+  input.addEventListener("input", () => {
+    setTyping(true);
+
+    setTimeout(() => setTyping(false), 1000);
+  });
+}
 
 function setTyping(state) {
 
@@ -191,8 +163,6 @@ function listenTyping() {
     const data = snap.val();
     const box = document.getElementById("typing");
 
-    if (!box) return;
-
     let arr = [];
 
     for (let id in data) {
@@ -201,12 +171,25 @@ function listenTyping() {
       }
     }
 
-    box.innerText =
-      arr.length ? "✍ " + arr.join(", ") + " yazıyor..." : "";
+    box.innerText = arr.length
+      ? "✍ " + arr.join(", ") + " yazıyor..."
+      : "";
   });
 }
 
-/* 🧹 CLEANUP (SMOOTH 100 LIMIT) */
+/* 😀 EMOJI */
+window.toggleEmoji = function () {
+  const box = document.getElementById("emojiBox");
+  box.style.display = box.style.display === "none" ? "block" : "none";
+};
+
+window.addEmoji = function (e) {
+  const input = document.getElementById("msg");
+  input.value += e;
+  input.focus();
+};
+
+/* 🧹 CLEANUP */
 function cleanupMessages() {
 
   const msgRef = ref(db, "rooms/" + roomId + "/messages");
@@ -232,14 +215,6 @@ function cleanupMessages() {
 
       const key = toDelete[i];
 
-      const el = document.querySelector(`[data-id="${key}"]`);
-
-      if (el) {
-        el.style.transition = "0.3s";
-        el.style.opacity = "0";
-        el.style.transform = "translateX(-20px)";
-      }
-
       setTimeout(() => {
         set(ref(db, "rooms/" + roomId + "/messages/" + key), null);
         i++;
@@ -252,60 +227,10 @@ function cleanupMessages() {
   }, { onlyOnce: true });
 }
 
-window.addEmoji = function(emoji) {
-  const input = document.getElementById("msg");
-  input.value += emoji;
-  input.focus();
-};
-
-window.deleteLastMessage = function () {
-
-  const msgRef = ref(db, "rooms/" + roomId + "/messages");
-
-  onValue(msgRef, (snap) => {
-
-    const data = snap.val();
-    if (!data) return;
-
-    const keys = Object.keys(data);
-
-    if (keys.length === 0) return;
-
-    const lastKey = keys[keys.length - 1];
-
-    set(ref(db, "rooms/" + roomId + "/messages/" + lastKey), null);
-
-  }, { onlyOnce: true });
-};
-
-window.toggleEmoji = function () {
-  const box = document.getElementById("emojiBox");
-  box.style.display = box.style.display === "none" ? "block" : "none";
-};
-
-window.addEmoji = function (emoji) {
-  const input = document.getElementById("msg");
-  input.value += emoji;
-  input.focus();
-};
+/* OPTIONS MENU */
 window.showMessageOptions = function (id, msg) {
 
-  let options = [];
-
-  // kendi mesajı
-  if (msg.name === name) {
-    options = [
-      { text: "🗑 Herkesten Sil", action: () => deleteMessage(id) },
-      { text: "❌ Sadece Benim İçin", action: () => hideForMe(id) }
-    ];
-  } else {
-    options = [
-      { text: "❌ Sadece Benim İçin", action: () => hideForMe(id) }
-    ];
-  }
-
   const menu = document.createElement("div");
-  menu.id = "contextMenu";
 
   menu.style.position = "fixed";
   menu.style.top = "50%";
@@ -314,22 +239,40 @@ window.showMessageOptions = function (id, msg) {
   menu.style.background = "#111827";
   menu.style.padding = "10px";
   menu.style.borderRadius = "10px";
-  menu.style.zIndex = "9999";
 
-  options.forEach(opt => {
-    const btn = document.createElement("button");
-    btn.innerText = opt.text;
-    btn.onclick = () => {
-      opt.action();
+  let options = [];
+
+  if (msg.name === name) {
+    options = [
+      { t: "🗑 Sil", a: () => del(id) },
+      { t: "❌ Gizle", a: () => hide(id) }
+    ];
+  } else {
+    options = [
+      { t: "❌ Gizle", a: () => hide(id) }
+    ];
+  }
+
+  options.forEach(o => {
+    const b = document.createElement("button");
+    b.innerText = o.t;
+    b.onclick = () => {
+      o.a();
       menu.remove();
     };
-    menu.style.display = "flex";
-    menu.style.flexDirection = "column";
-    btn.style.margin = "5px";
-    menu.appendChild(btn);
+    menu.appendChild(b);
   });
 
   document.body.appendChild(menu);
 
-  setTimeout(() => menu.remove(), 5000);
+  setTimeout(() => menu.remove(), 4000);
 };
+
+function del(id) {
+  set(ref(db, "rooms/" + roomId + "/messages/" + id), null);
+}
+
+function hide(id) {
+  const el = document.querySelector(`[data-id="${id}"]`);
+  if (el) el.style.display = "none";
+}
