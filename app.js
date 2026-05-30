@@ -90,7 +90,7 @@ function listenMessages() {
 
       let pressTimer;
 
-      let pressTimer = null;
+      
 
 const startPress = () => {
   pressTimer = setTimeout(() => {
