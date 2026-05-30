@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Realtime Chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <h1>💬 Chat App</h1>
+
+  <input id="roomId" placeholder="Oda Kodu">
+  <input id="name" placeholder="İsim">
+
+  <button onclick="joinRoom()">Giriş</button>
+</div>
+
+<!-- CHAT -->
+<div id="chatApp" style="display:none;">
+
+  <h2 id="roomText"></h2>
+
+  <div id="users"></div>
+
+  <hr>
+
+  <div id="chatBox"></div>
+
+  <input id="msg" placeholder="Mesaj...">
+  <button onclick="sendMessage()">Gönder</button>
+
+</div>
+
+<script type="module" src="app.js"></script>
+
+</body>
+</html>
