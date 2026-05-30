@@ -247,3 +247,14 @@ window.deleteLastMessage = function () {
 
   }, { onlyOnce: true });
 };
+
+window.toggleEmoji = function () {
+  const box = document.getElementById("emojiBox");
+  box.style.display = box.style.display === "none" ? "block" : "none";
+};
+
+window.addEmoji = function (emoji) {
+  const input = document.getElementById("msg");
+  input.value += emoji;
+  input.focus();
+};
