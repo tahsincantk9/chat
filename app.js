@@ -221,3 +221,29 @@ function cleanupMessages() {
 
   }, { onlyOnce: true });
 }
+
+window.addEmoji = function(emoji) {
+  const input = document.getElementById("msg");
+  input.value += emoji;
+  input.focus();
+};
+
+window.deleteLastMessage = function () {
+
+  const msgRef = ref(db, "rooms/" + roomId + "/messages");
+
+  onValue(msgRef, (snap) => {
+
+    const data = snap.val();
+    if (!data) return;
+
+    const keys = Object.keys(data);
+
+    if (keys.length === 0) return;
+
+    const lastKey = keys[keys.length - 1];
+
+    set(ref(db, "rooms/" + roomId + "/messages/" + lastKey), null);
+
+  }, { onlyOnce: true });
+};
