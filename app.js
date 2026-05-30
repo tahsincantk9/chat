@@ -61,11 +61,41 @@ window.sendMessage = function () {
 
   setTyping(false);
   cleanupMessages();
+  push(ref(db, "rooms/" + roomId + "/messages"), {
+  name,
+  text: msg,
+  time: Date.now(),
+  owner: name
+});
 };
 
 /* 📥 MESSAGES */
 function listenMessages() {
+  const div = document.createElement("div");
 
+div.classList.add("message");
+div.setAttribute("data-id", id);
+
+if (m.name === name) {
+  div.style.marginLeft = "auto";
+  div.style.background = "#3b82f6";
+}
+
+/* LONG PRESS */
+let pressTimer;
+
+div.addEventListener("mousedown", () => {
+  pressTimer = setTimeout(() => {
+    showMessageOptions(id, m);
+  }, 600);
+});
+
+div.addEventListener("mouseup", () => clearTimeout(pressTimer));
+div.addEventListener("mouseleave", () => clearTimeout(pressTimer));
+
+div.innerHTML = `<b>${m.name}</b><br>${m.text}`;
+
+box.appendChild(div);
   onValue(ref(db, "rooms/" + roomId + "/messages"), (snap) => {
 
     const data = snap.val();
@@ -257,4 +287,49 @@ window.addEmoji = function (emoji) {
   const input = document.getElementById("msg");
   input.value += emoji;
   input.focus();
+};
+window.showMessageOptions = function (id, msg) {
+
+  let options = [];
+
+  // kendi mesajı
+  if (msg.name === name) {
+    options = [
+      { text: "🗑 Herkesten Sil", action: () => deleteMessage(id) },
+      { text: "❌ Sadece Benim İçin", action: () => hideForMe(id) }
+    ];
+  } else {
+    options = [
+      { text: "❌ Sadece Benim İçin", action: () => hideForMe(id) }
+    ];
+  }
+
+  const menu = document.createElement("div");
+  menu.id = "contextMenu";
+
+  menu.style.position = "fixed";
+  menu.style.top = "50%";
+  menu.style.left = "50%";
+  menu.style.transform = "translate(-50%, -50%)";
+  menu.style.background = "#111827";
+  menu.style.padding = "10px";
+  menu.style.borderRadius = "10px";
+  menu.style.zIndex = "9999";
+
+  options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.innerText = opt.text;
+    btn.onclick = () => {
+      opt.action();
+      menu.remove();
+    };
+    menu.style.display = "flex";
+    menu.style.flexDirection = "column";
+    btn.style.margin = "5px";
+    menu.appendChild(btn);
+  });
+
+  document.body.appendChild(menu);
+
+  setTimeout(() => menu.remove(), 5000);
 };
