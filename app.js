@@ -52,13 +52,17 @@ window.sendMessage = function () {
   const msg = document.getElementById("msg").value;
   if (!msg) return;
 
-  push(ref(db, "rooms/" + roomId + "/messages"), {
+  const msgRef = ref(db, "rooms/" + roomId + "/messages");
+
+  push(msgRef, {
     name,
     text: msg,
     time: Date.now()
   });
 
   document.getElementById("msg").value = "";
+
+  cleanupMessages();
 };
 
 /* 📥 MESSAGES */
@@ -120,4 +124,27 @@ function listenUsers() {
       box.appendChild(div);
     }
   });
+}
+function cleanupMessages() {
+
+  const msgRef = ref(db, "rooms/" + roomId + "/messages");
+
+  onValue(msgRef, (snap) => {
+
+    const data = snap.val();
+    if (!data) return;
+
+    const keys = Object.keys(data);
+
+    if (keys.length <= 100) return;
+
+    // en eski mesajları sil
+    const sorted = keys.sort((a, b) => data[a].time - data[b].time);
+
+    const toDelete = sorted.slice(0, keys.length - 100);
+
+    toDelete.forEach(key => {
+      set(ref(db, "rooms/" + roomId + "/messages/" + key), null);
+    });
+  }, { onlyOnce: true });
 }
