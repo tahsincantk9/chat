@@ -55,3 +55,26 @@ input {
   display: flex;
   flex-direction: column;
 }
+body {
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#chatApp {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#chatBox {
+  flex: 1;
+  overflow-y: auto;
+}
+
+#emojiBox {
+  background: #1e293b;
+  padding: 5px;
+  border-radius: 10px;
+  margin: 5px;
+}
