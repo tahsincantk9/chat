@@ -33,11 +33,17 @@
   <input id="msg" placeholder="Mesaj...">
   <button onclick="sendMessage()">Gönder</button>
   <button onclick="deleteLastMessage()">🗑 Son Mesajı Sil</button>
+  <button onclick="toggleEmoji()">😊</button>
+
+<div id="emojiBox" style="display:none;">
   <button onclick="addEmoji('😀')">😀</button>
   <button onclick="addEmoji('😂')">😂</button>
   <button onclick="addEmoji('🔥')">🔥</button>
   <button onclick="addEmoji('❤️')">❤️</button>
-  <audio id="notifySound" src="https://www.myinstants.com/media/sounds/notification.mp3"></audio>
+</div>
+
+<audio id="notifySound"
+src="https://www.myinstants.com/media/sounds/notification.mp3"></audio>
 </div>
 
 <script type="module" src="app.js"></script>
