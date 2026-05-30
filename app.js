@@ -8,15 +8,15 @@ import {
   onDisconnect
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-/* FIREBASE CONFIG */
+/* FIREBASE */
 const firebaseConfig = {
-apiKey: "AIzaSyBZNpGv5Yk54JFB_5U6Qr6iNx2PaPrhIFo",
-  authDomain:  "party-hub-90183.firebaseapp.com",
-  databaseURL: "https://party-hub-90183-default-rtdb.europe-west1.firebasedatabase.app/",
-  projectId: "party-hub-90183",
-  storageBucket:  "party-hub-90183.firebasestorage.app",
-  messagingSenderId: "230836884321",
-  appId: "1:230836884321:web:81b3eb36d650c18d0d6b20"
+  apiKey: "XXX",
+  authDomain: "XXX",
+  databaseURL: "XXX",
+  projectId: "XXX",
+  storageBucket: "XXX",
+  messagingSenderId: "XXX",
+  appId: "XXX"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -34,8 +34,6 @@ window.joinRoom = function () {
 
   if (!roomId || !name) return alert("Eksik bilgi");
 
-  localStorage.setItem("name", name);
-
   document.getElementById("login").style.display = "none";
   document.getElementById("chatApp").style.display = "block";
 
@@ -44,17 +42,16 @@ window.joinRoom = function () {
   setOnline();
   listenMessages();
   listenUsers();
+  listenTyping();
 };
 
-/* 💬 SEND MESSAGE */
+/* 💬 SEND */
 window.sendMessage = function () {
 
   const msg = document.getElementById("msg").value;
   if (!msg) return;
 
-  const msgRef = ref(db, "rooms/" + roomId + "/messages");
-
-  push(msgRef, {
+  push(ref(db, "rooms/" + roomId + "/messages"), {
     name,
     text: msg,
     time: Date.now()
@@ -62,6 +59,7 @@ window.sendMessage = function () {
 
   document.getElementById("msg").value = "";
 
+  setTyping(false);
   cleanupMessages();
 };
 
@@ -76,10 +74,20 @@ function listenMessages() {
     box.innerHTML = "";
 
     for (let id in data) {
+
       const m = data[id];
 
       const div = document.createElement("div");
-      div.innerHTML = `<b>${m.name}:</b> ${m.text}`;
+
+      div.classList.add("message");
+
+      /* SAĞ-SOL MESAJ */
+      if (m.name === name) {
+        div.style.marginLeft = "auto";
+        div.style.background = "#3b82f6";
+      }
+
+      div.innerHTML = `<b>${m.name}</b><br>${m.text}`;
 
       box.appendChild(div);
     }
@@ -88,7 +96,7 @@ function listenMessages() {
   });
 }
 
-/* 👥 ONLINE SYSTEM */
+/* 👥 ONLINE */
 function setOnline() {
 
   const userRef = ref(db, "rooms/" + roomId + "/users/" + name);
@@ -119,12 +127,56 @@ function listenUsers() {
       const u = data[id];
 
       const div = document.createElement("div");
-      div.innerHTML = u.online ? "🟢 " + u.name : "⚫ " + u.name;
+
+      div.innerHTML = u.online
+        ? "🟢 " + u.name
+        : "⚫ " + u.name;
 
       box.appendChild(div);
     }
   });
 }
+
+/* ✍ TYPING */
+document.getElementById("msg").addEventListener("input", () => {
+  setTyping(true);
+
+  setTimeout(() => {
+    setTyping(false);
+  }, 1500);
+});
+
+function setTyping(state) {
+  set(ref(db, "rooms/" + roomId + "/typing/" + name), {
+    typing: state
+  });
+}
+
+function listenTyping() {
+
+  onValue(ref(db, "rooms/" + roomId + "/typing"), (snap) => {
+
+    const data = snap.val();
+    const typingBox = document.getElementById("typing");
+
+    if (!typingBox) return;
+
+    let typingUsers = [];
+
+    for (let id in data) {
+      if (data[id].typing && id !== name) {
+        typingUsers.push(id);
+      }
+    }
+
+    typingBox.innerText =
+      typingUsers.length > 0
+        ? "✍ " + typingUsers.join(", ") + " yazıyor..."
+        : "";
+  });
+}
+
+/* 🧹 CLEANUP (100 MESAJ LIMIT) */
 function cleanupMessages() {
 
   const msgRef = ref(db, "rooms/" + roomId + "/messages");
@@ -138,7 +190,6 @@ function cleanupMessages() {
 
     if (keys.length <= 100) return;
 
-    // en eski mesajları sil
     const sorted = keys.sort((a, b) => data[a].time - data[b].time);
 
     const toDelete = sorted.slice(0, keys.length - 100);
@@ -146,5 +197,6 @@ function cleanupMessages() {
     toDelete.forEach(key => {
       set(ref(db, "rooms/" + roomId + "/messages/" + key), null);
     });
+
   }, { onlyOnce: true });
 }
