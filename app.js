@@ -90,14 +90,27 @@ function listenMessages() {
 
       let pressTimer;
 
-      div.addEventListener("mousedown", () => {
-        pressTimer = setTimeout(() => {
-          showMessageOptions(id, m);
-        }, 600);
-      });
+      let pressTimer = null;
 
-      div.addEventListener("mouseup", () => clearTimeout(pressTimer));
-      div.addEventListener("mouseleave", () => clearTimeout(pressTimer));
+const startPress = () => {
+  pressTimer = setTimeout(() => {
+    showMessageOptions(id, m);
+  }, 600);
+};
+
+const cancelPress = () => {
+  clearTimeout(pressTimer);
+};
+
+/* PC */
+div.addEventListener("mousedown", startPress);
+div.addEventListener("mouseup", cancelPress);
+div.addEventListener("mouseleave", cancelPress);
+
+/* 📱 MOBILE */
+div.addEventListener("touchstart", startPress);
+div.addEventListener("touchend", cancelPress);
+div.addEventListener("touchcancel", cancelPress);
 
       div.innerHTML = `<b>${m.name}</b><br>${m.text}`;
 
@@ -239,6 +252,7 @@ window.showMessageOptions = function (id, msg) {
   menu.style.background = "#111827";
   menu.style.padding = "10px";
   menu.style.borderRadius = "10px";
+  menu.style.zIndex = "9999";
 
   let options = [];
 
@@ -256,6 +270,7 @@ window.showMessageOptions = function (id, msg) {
   options.forEach(o => {
     const b = document.createElement("button");
     b.innerText = o.t;
+    b.style.margin = "5px";
     b.onclick = () => {
       o.a();
       menu.remove();
@@ -268,10 +283,12 @@ window.showMessageOptions = function (id, msg) {
   setTimeout(() => menu.remove(), 4000);
 };
 
+/* DELETE */
 function del(id) {
   set(ref(db, "rooms/" + roomId + "/messages/" + id), null);
 }
 
+/* HIDE */
 function hide(id) {
   const el = document.querySelector(`[data-id="${id}"]`);
   if (el) el.style.display = "none";
