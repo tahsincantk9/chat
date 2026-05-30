@@ -1,93 +1,67 @@
 body {
   margin: 0;
   font-family: Arial;
-  background: linear-gradient(135deg, #0f172a, #111827);
+  background: #0f172a;
   color: white;
 }
 
-/* CHAT LAYOUT */
-#chatApp {
-  display: flex;
-  height: 100vh;
+#login {
+  text-align: center;
+  margin-top: 100px;
 }
 
-/* USERS */
-#users {
-  width: 200px;
-  background: rgba(255,255,255,0.05);
-  padding: 10px;
-  backdrop-filter: blur(10px);
-}
-
-/* CHAT BOX */
-#chatBox {
-  flex: 1;
-  padding: 10px;
-  overflow-y: auto;
-  background: rgba(255,255,255,0.03);
-}
-
-/* MESSAGE */
-.message {
-  background: rgba(255,255,255,0.08);
-  margin: 6px;
-  padding: 10px;
-  border-radius: 12px;
-  max-width: 70%;
-}
-
-/* INPUT AREA */
 input {
   padding: 10px;
-  border-radius: 10px;
+  margin: 5px;
+  border-radius: 8px;
   border: none;
 }
 
-.message {
-  padding: 10px;
-  margin: 6px;
-  border-radius: 12px;
-  background: #334155;
-  max-width: 60%;
-}
-
-#chatBox {
-  display: flex;
-  flex-direction: column;
-}
-body {
-  margin: 0;
-  height: 100vh;
-  overflow: hidden;
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  background: #3b82f6;
+  color: white;
 }
 
 #chatApp {
-  height: 100vh;
   display: flex;
   flex-direction: column;
-}
-
-#chatBox {
-  flex: 1;
-  overflow-y: auto;
-}
-
-#emojiBox {
-  background: #1e293b;
-  padding: 5px;
-  border-radius: 10px;
-  margin: 5px;
-}
-#chatBox {
-  flex: 1;
-  overflow-y: auto;
+  height: 100vh;
   padding: 10px;
+}
+
+#chatBox {
+  flex: 1;
+  overflow-y: auto;
+  background: #1e293b;
+  padding: 10px;
+  border-radius: 10px;
 }
 
 .message {
+  background: #334155;
+  margin: 5px;
   padding: 10px;
-  margin: 6px;
-  border-radius: 12px;
-  max-width: 75%;
-  word-wrap: break-word;
+  border-radius: 10px;
+  max-width: 70%;
+  word-break: break-word;
+}
+
+#emojiBox {
+  background: #111827;
+  padding: 5px;
+  margin: 5px 0;
+  border-radius: 10px;
+}
+
+#users {
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+#typing {
+  font-size: 12px;
+  opacity: 0.7;
 }
