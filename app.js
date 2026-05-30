@@ -45,7 +45,7 @@ window.joinRoom = function () {
   listenTyping();
 };
 
-/* 💬 SEND */
+/* 💬 SEND MESSAGE */
 window.sendMessage = function () {
 
   const msg = document.getElementById("msg").value;
@@ -80,8 +80,8 @@ function listenMessages() {
       const div = document.createElement("div");
 
       div.classList.add("message");
+      div.setAttribute("data-id", id);
 
-      /* SAĞ-SOL MESAJ */
       if (m.name === name) {
         div.style.marginLeft = "auto";
         div.style.background = "#3b82f6";
@@ -139,14 +139,16 @@ function listenUsers() {
 
 /* ✍ TYPING */
 document.getElementById("msg").addEventListener("input", () => {
+
   setTyping(true);
 
   setTimeout(() => {
     setTyping(false);
-  }, 1500);
+  }, 1200);
 });
 
 function setTyping(state) {
+
   set(ref(db, "rooms/" + roomId + "/typing/" + name), {
     typing: state
   });
@@ -157,26 +159,24 @@ function listenTyping() {
   onValue(ref(db, "rooms/" + roomId + "/typing"), (snap) => {
 
     const data = snap.val();
-    const typingBox = document.getElementById("typing");
+    const box = document.getElementById("typing");
 
-    if (!typingBox) return;
+    if (!box) return;
 
-    let typingUsers = [];
+    let arr = [];
 
     for (let id in data) {
       if (data[id].typing && id !== name) {
-        typingUsers.push(id);
+        arr.push(id);
       }
     }
 
-    typingBox.innerText =
-      typingUsers.length > 0
-        ? "✍ " + typingUsers.join(", ") + " yazıyor..."
-        : "";
+    box.innerText =
+      arr.length ? "✍ " + arr.join(", ") + " yazıyor..." : "";
   });
 }
 
-/* 🧹 CLEANUP (100 MESAJ LIMIT) */
+/* 🧹 CLEANUP (SMOOTH 100 LIMIT) */
 function cleanupMessages() {
 
   const msgRef = ref(db, "rooms/" + roomId + "/messages");
@@ -194,9 +194,30 @@ function cleanupMessages() {
 
     const toDelete = sorted.slice(0, keys.length - 100);
 
-    toDelete.forEach(key => {
-      set(ref(db, "rooms/" + roomId + "/messages/" + key), null);
-    });
+    let i = 0;
+
+    function del() {
+
+      if (i >= toDelete.length) return;
+
+      const key = toDelete[i];
+
+      const el = document.querySelector(`[data-id="${key}"]`);
+
+      if (el) {
+        el.style.transition = "0.3s";
+        el.style.opacity = "0";
+        el.style.transform = "translateX(-20px)";
+      }
+
+      setTimeout(() => {
+        set(ref(db, "rooms/" + roomId + "/messages/" + key), null);
+        i++;
+        del();
+      }, 300);
+    }
+
+    del();
 
   }, { onlyOnce: true });
 }
