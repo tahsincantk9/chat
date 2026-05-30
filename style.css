@@ -42,3 +42,16 @@ input {
   border-radius: 10px;
   border: none;
 }
+
+.message {
+  padding: 10px;
+  margin: 6px;
+  border-radius: 12px;
+  background: #334155;
+  max-width: 60%;
+}
+
+#chatBox {
+  display: flex;
+  flex-direction: column;
+}
