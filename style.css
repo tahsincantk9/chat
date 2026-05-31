@@ -23,14 +23,35 @@ html, body {
   -webkit-overflow-scrolling: touch;
 }
 
-.message {
-  background: #334155;
-  margin: 5px;
-  padding: 10px;
-  border-radius: 10px;
-  max-width: 70%;
-  word-break: break-word;
-  font-size: 15px;
+.message{
+  padding:10px;
+  margin:6px;
+  border-radius:12px;
+  max-width:70%;
+  word-break:break-word;
+  font-size:15px;
+  display:inline-block;
+}
+
+/* BAŞKASI */
+.message.left{
+  background:#334155;
+  align-self:flex-start;
+  border-top-left-radius:4px;
+}
+
+/* SEN */
+.message.right{
+  background:#3b82f6;
+  align-self:flex-end;
+  border-top-right-radius:4px;
+  color:white;
+}
+
+/* CHAT DÜZENİ */
+#chatBox{
+  display:flex;
+  flex-direction:column;
 }
 
 #bottomBar {
