@@ -99,3 +99,29 @@ html, body {
   font-size: 15px;
   word-break: break-word;
 }
+
+#chatApp {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* mesaj kutusu */
+#chatBox {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* alt bar (input + butonlar) */
+#bottomBar {
+  padding: 8px;
+  background: #0f172a;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+
+  /* 🔥 bunu yukarı kaldırıyor */
+  position: sticky;
+  bottom: 0;
+}
