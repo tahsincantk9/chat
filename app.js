@@ -374,3 +374,5 @@ window.cancelReply = function(){
   document.getElementById("replyBar")
     .style.display = "none";
 }
+
+document.body.innerHTML += "<div style='position:fixed;top:0;background:red;z-index:9999'>TEST</div>";
