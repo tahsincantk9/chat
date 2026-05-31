@@ -8,23 +8,32 @@ html, body {
   color: white;
 }
 
+/* LOGIN */
+#login{
+  text-align:center;
+  margin-top:100px;
+}
+
+/* CHAT APP */
 #chatApp{
   height:100vh;
-  display:flex;
+  display:none; /* login varsa önemli */
   flex-direction:column;
   padding:10px;
   overflow:hidden;
 }
 
-#chatApp{
-  height:100vh;
+/* CHAT BOX */
+#chatBox{
+  flex:1;
+  overflow-y:auto;
   display:flex;
   flex-direction:column;
+  gap:6px;
   padding:10px;
-  overflow:hidden;
 }
 
-
+/* MESSAGE BUBBLE */
 .message{
   padding:10px;
   margin:6px;
@@ -50,44 +59,44 @@ html, body {
   color:white;
 }
 
-/* CHAT DÜZENİ */
-#chatBox{
-  display:flex;
-  flex-direction:column;
-}
-
+/* BOTTOM BAR */
 #bottomBar{
   display:flex;
   flex-direction:column;
   gap:6px;
   flex-shrink:0;
+  padding:8px;
+  background:#0f172a;
 }
 
+/* REPLY BAR */
 #replyBar{
   display:none;
   background:#1f2937;
   padding:8px;
   border-left:4px solid #3b82f6;
   border-radius:6px;
-
-#emojiBox {
-  background: #111827;
-  padding: 5px;
-  margin: 5px 0;
-  border-radius: 10px;
-}
-
-#users {
-  margin-bottom: 5px;
-  font-size: 14px;
-}
-
-#typing {
-  font-size: 12px;
-  opacity: 0.7;
-}
-}
   max-height:80px;
   overflow:hidden;
   word-break:break-word;
+}
+
+/* USERS */
+#users{
+  margin-bottom:5px;
+  font-size:14px;
+}
+
+/* TYPING */
+#typing{
+  font-size:12px;
+  opacity:0.7;
+}
+
+/* EMOJI */
+#emojiBox{
+  background:#111827;
+  padding:5px;
+  margin:5px 0;
+  border-radius:10px;
 }
