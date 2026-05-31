@@ -77,6 +77,12 @@ window.sendMessage = function () {
 
 /* 📥 MESSAGES */
 function listenMessages() {
+  const box = document.getElementById("chatBox");
+
+if (!box) {
+  console.log("chatBox yok, chat açılmamış");
+  return;
+}
 
   onValue(ref(db, "rooms/" + roomId + "/messages"), (snap) => {
 
