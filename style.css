@@ -47,7 +47,7 @@ html, body {
 
 /* CHAT APP */
 #chatApp{
-  height:100vh;
+  height:100dvh;
   display:none; /* login varsa önemli */
   flex-direction:column;
   padding:10px;
@@ -98,6 +98,10 @@ html, body {
   flex-shrink:0;
   padding:8px;
   background:#0f172a;
+  position:sticky;
+  bottom:0;
+  background:#0f172a;
+  z-index:10;
 }
 
 /* REPLY BAR */
@@ -130,4 +134,9 @@ html, body {
   padding:5px;
   margin:5px 0;
   border-radius:10px;
+}
+
+#bottomBar input{
+  min-height:40px;
+  font-size:16px; /* mobil zoom fix */
 }
