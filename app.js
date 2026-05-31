@@ -139,14 +139,23 @@ if (!box) {
       // 🧹 LONG PRESS
       let pressTimer;
 
-      div.addEventListener("mousedown", () => {
-        pressTimer = setTimeout(() => {
-          showMessageOptions(id, m);
-        }, 600);
-      });
+const startPress = () => {
+  pressTimer = setTimeout(() => {
+    showMessageOptions(id, m);
+  }, 600);
+};
 
-      div.addEventListener("mouseup", () => clearTimeout(pressTimer));
-      div.addEventListener("mouseleave", () => clearTimeout(pressTimer));
+const cancelPress = () => {
+  clearTimeout(pressTimer);
+};
+
+div.addEventListener("mousedown", startPress);
+div.addEventListener("mouseup", cancelPress);
+div.addEventListener("mouseleave", cancelPress);
+
+div.addEventListener("touchstart", startPress);
+div.addEventListener("touchend", cancelPress);
+div.addEventListener("touchcancel", cancelPress);
 
       // 💬 MESSAGE UI
       div.innerHTML = `
@@ -373,5 +382,5 @@ window.cancelReply = function(){
     .style.display = "none";
 }
 
-document.body.innerHTML += "<div style='position:fixed;top:0;background:red;z-index:9999'>TEST</div>";
+
 
