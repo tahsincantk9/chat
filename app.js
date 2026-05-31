@@ -391,3 +391,4 @@ window.cancelReply = function(){
 }
 
 document.body.innerHTML += "<div style='position:fixed;top:0;background:red;z-index:9999'>TEST</div>";
+}
