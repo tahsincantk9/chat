@@ -159,25 +159,35 @@ div.addEventListener("touchcancel", cancelPress);
 
       // 💬 MESSAGE UI
       div.innerHTML = `
-        ${
-          m.reply
-            ? `<div style="
-                font-size:12px;
-                opacity:.7;
-                border-left:3px solid #3b82f6;
-                padding-left:5px;
-                margin-bottom:5px;
-              ">
-                ↩ ${m.reply.sender}<br>
-                ${m.reply.text}
-              </div>`
-            : ""
-        }
+  ${
+    m.reply
+      ? `<div style="
+          font-size:12px;
+          opacity:.7;
+          border-left:3px solid #3b82f6;
+          padding-left:5px;
+          margin-bottom:5px;
+        ">
+          ↩ ${m.reply.sender}<br>
+          ${m.reply.text}
+        </div>`
+      : ""
+  }
 
-        <b>${m.name}</b><br>
-        ${m.text}
-      `;
+  <b>${m.name}</b><br>
+  ${m.text}
 
+  ${
+    m.reaction
+      ? `<div style="
+          margin-top:4px;
+          font-size:18px;
+        ">
+          ${m.reaction}
+        </div>`
+      : ""
+  }
+`;
       box.appendChild(div);
     }
 
@@ -308,6 +318,7 @@ function cleanupMessages() {
 
 /* OPTIONS MENU */
 window.showMessageOptions = function (id, msg) {
+ 
 
   const menu = document.createElement("div");
 
@@ -332,7 +343,11 @@ window.showMessageOptions = function (id, msg) {
       { t: "❌ Gizle", a: () => hide(id) }
     ];
   }
-
+   options.unshift(
+  { t: "❤️", a: () => react(id,"❤️") },
+  { t: "😂", a: () => react(id,"😂") },
+  { t: "🔥", a: () => react(id,"🔥") }
+);
   options.forEach(o => {
     const b = document.createElement("button");
     b.innerText = o.t;
@@ -352,6 +367,18 @@ window.showMessageOptions = function (id, msg) {
 /* DELETE */
 function del(id) {
   set(ref(db, "rooms/" + roomId + "/messages/" + id), null);
+}
+
+function react(id, emoji) {
+
+  set(
+    ref(
+      db,
+      "rooms/" + roomId + "/messages/" + id + "/reaction"
+    ),
+    emoji
+  );
+
 }
 
 /* HIDE */
