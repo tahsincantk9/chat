@@ -25,6 +25,7 @@ const db = getDatabase(app);
 /* STATE */
 let roomId = "";
 let name = "";
+let replyMessage = null;
 
 /* 🚪 JOIN */
 window.joinRoom = function () {
@@ -52,11 +53,21 @@ window.sendMessage = function () {
   const msg = document.getElementById("msg").value;
   if (!msg) return;
 
-  push(ref(db, "rooms/" + roomId + "/messages"), {
-    name,
-    text: msg,
-    time: Date.now()
-  });
+  push(ref(db,
+"rooms/" + roomId + "/messages"), {
+
+  name,
+  text: msg,
+  time: Date.now(),
+
+  reply: replyMessage
+    ? {
+        sender: replyMessage.sender,
+        text: replyMessage.text
+      }
+    : null
+
+});
 
   document.getElementById("msg").value = "";
 
@@ -72,7 +83,55 @@ function listenMessages() {
     const data = snap.val();
     const box = document.getElementById("chatBox");
 
-    box.innerHTML = "";
+    let startX = 0;
+
+div.addEventListener("touchstart", (e) => {
+  startX = e.touches[0].clientX;
+});
+
+div.addEventListener("touchmove", (e) => {
+
+  const diff =
+    e.touches[0].clientX - startX;
+
+  if (diff > 70) {
+
+    replyMessage = {
+      id,
+      sender: m.name,
+      text: m.text
+    };
+
+    showReplyBar();
+
+    div.style.transform =
+      "translateX(50px)";
+  }
+});
+
+div.addEventListener("touchend", () => {
+  div.style.transform = "";
+});
+    
+  div.innerHTML = `
+  ${
+    m.reply
+      ? `<div style="
+          font-size:12px;
+          opacity:.7;
+          border-left:3px solid #3b82f6;
+          padding-left:5px;
+          margin-bottom:5px;
+        ">
+          ↩ ${m.reply.sender}<br>
+          ${m.reply.text}
+        </div>`
+      : ""
+  }
+
+  <b>${m.name}</b><br>
+  ${m.text}
+`;
 
     for (let id in data) {
 
@@ -292,4 +351,26 @@ function del(id) {
 function hide(id) {
   const el = document.querySelector(`[data-id="${id}"]`);
   if (el) el.style.display = "none";
+}
+
+function showReplyBar(){
+
+  const bar =
+    document.getElementById("replyBar");
+
+  bar.style.display = "block";
+
+  bar.innerHTML = `
+    ↩ ${replyMessage.sender}<br>
+    ${replyMessage.text}
+    <button onclick="cancelReply()">❌</button>
+  `;
+}
+
+window.cancelReply = function(){
+
+  replyMessage = null;
+
+  document.getElementById("replyBar")
+    .style.display = "none";
 }
