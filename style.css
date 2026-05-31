@@ -65,3 +65,12 @@ button {
   font-size: 12px;
   opacity: 0.7;
 }
+
+#replyBar{
+  display:none;
+  background:#1e293b;
+  padding:8px;
+  border-left:4px solid #3b82f6;
+  margin-bottom:5px;
+  border-radius:8px;
+}
