@@ -177,6 +177,8 @@ div.addEventListener("touchcancel", cancelPress);
   <b>${m.name}</b><br>
   ${m.text}
 
+  ${m.edited ? '<small>(düzenlendi)</small>' : ''}
+
   ${
     m.reaction
       ? `<div style="
@@ -335,6 +337,7 @@ window.showMessageOptions = function (id, msg) {
 
   if (msg.name === name) {
     options = [
+      { t: "✏️ Düzenle", a: () => editMessage(id, msg) },
       { t: "🗑 Sil", a: () => del(id) },
       { t: "❌ Gizle", a: () => hide(id) }
     ];
@@ -377,6 +380,33 @@ function react(id, emoji) {
       "rooms/" + roomId + "/messages/" + id + "/reaction"
     ),
     emoji
+  );
+
+}
+
+function editMessage(id, msg){
+
+  const newText = prompt(
+    "Mesajı düzenle:",
+    msg.text
+  );
+
+  if(!newText) return;
+
+  set(
+    ref(
+      db,
+      "rooms/" + roomId + "/messages/" + id + "/text"
+    ),
+    newText
+  );
+
+  set(
+    ref(
+      db,
+      "rooms/" + roomId + "/messages/" + id + "/edited"
+    ),
+    true
   );
 
 }
