@@ -176,24 +176,7 @@ if (!box) {
   });
 }
 
-/* PC */
-div.addEventListener("mousedown", startPress);
-div.addEventListener("mouseup", cancelPress);
-div.addEventListener("mouseleave", cancelPress);
 
-/* 📱 MOBILE */
-div.addEventListener("touchstart", startPress);
-div.addEventListener("touchend", cancelPress);
-div.addEventListener("touchcancel", cancelPress);
-
-      div.innerHTML = `<b>${m.name}</b><br>${m.text}`;
-
-      box.appendChild(div);
-    }
-
-    box.scrollTop = box.scrollHeight;
-  });
-}
 
 /* 👤 USERS */
 function setOnline() {
@@ -391,4 +374,4 @@ window.cancelReply = function(){
 }
 
 document.body.innerHTML += "<div style='position:fixed;top:0;background:red;z-index:9999'>TEST</div>";
-}
+
