@@ -91,7 +91,11 @@ button {
   background:#1f2937;
   padding:8px;
   border-left:4px solid #3b82f6;
-  margin-bottom:5px;
+  margin-bottom:8px;
+  position:relative;
+  z-index:10;
+  min-height:40px;
+  word-break:break-word;
 }
 
 html, body {
