@@ -88,11 +88,10 @@ button {
 
 #replyBar{
   display:none;
-  background:#1e293b;
+  background:#1f2937;
   padding:8px;
   border-left:4px solid #3b82f6;
   margin-bottom:5px;
-  border-radius:8px;
 }
 
 html, body {
