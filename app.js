@@ -83,55 +83,9 @@ function listenMessages() {
     const data = snap.val();
     const box = document.getElementById("chatBox");
 
-    let startX = 0;
+    box.innerHTML = "";
 
-div.addEventListener("touchstart", (e) => {
-  startX = e.touches[0].clientX;
-});
-
-div.addEventListener("touchmove", (e) => {
-
-  const diff =
-    e.touches[0].clientX - startX;
-
-  if (diff > 70) {
-
-    replyMessage = {
-      id,
-      sender: m.name,
-      text: m.text
-    };
-
-    showReplyBar();
-
-    div.style.transform =
-      "translateX(50px)";
-  }
-});
-
-div.addEventListener("touchend", () => {
-  div.style.transform = "";
-});
-    
-  div.innerHTML = `
-  ${
-    m.reply
-      ? `<div style="
-          font-size:12px;
-          opacity:.7;
-          border-left:3px solid #3b82f6;
-          padding-left:5px;
-          margin-bottom:5px;
-        ">
-          ↩ ${m.reply.sender}<br>
-          ${m.reply.text}
-        </div>`
-      : ""
-  }
-
-  <b>${m.name}</b><br>
-  ${m.text}
-`;
+    if (!data) return;
 
     for (let id in data) {
 
@@ -147,19 +101,74 @@ div.addEventListener("touchend", () => {
         div.style.background = "#3b82f6";
       }
 
+      // 📱 SWIPE REPLY (TEMİZ)
+      let startX = 0;
+
+      div.addEventListener("touchstart", (e) => {
+        startX = e.touches[0].clientX;
+      });
+
+      div.addEventListener("touchmove", (e) => {
+
+        const diff = e.touches[0].clientX - startX;
+
+        if (diff > 70) {
+
+          replyMessage = {
+            id,
+            sender: m.name,
+            text: m.text
+          };
+
+          showReplyBar();
+
+          div.style.transform = "translateX(50px)";
+        }
+      });
+
+      div.addEventListener("touchend", () => {
+        div.style.transform = "";
+      });
+
+      // 🧹 LONG PRESS
       let pressTimer;
 
-      
+      div.addEventListener("mousedown", () => {
+        pressTimer = setTimeout(() => {
+          showMessageOptions(id, m);
+        }, 600);
+      });
 
-const startPress = () => {
-  pressTimer = setTimeout(() => {
-    showMessageOptions(id, m);
-  }, 600);
-};
+      div.addEventListener("mouseup", () => clearTimeout(pressTimer));
+      div.addEventListener("mouseleave", () => clearTimeout(pressTimer));
 
-const cancelPress = () => {
-  clearTimeout(pressTimer);
-};
+      // 💬 MESSAGE UI
+      div.innerHTML = `
+        ${
+          m.reply
+            ? `<div style="
+                font-size:12px;
+                opacity:.7;
+                border-left:3px solid #3b82f6;
+                padding-left:5px;
+                margin-bottom:5px;
+              ">
+                ↩ ${m.reply.sender}<br>
+                ${m.reply.text}
+              </div>`
+            : ""
+        }
+
+        <b>${m.name}</b><br>
+        ${m.text}
+      `;
+
+      box.appendChild(div);
+    }
+
+    box.scrollTop = box.scrollHeight;
+  });
+}
 
 /* PC */
 div.addEventListener("mousedown", startPress);
