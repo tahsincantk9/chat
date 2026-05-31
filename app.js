@@ -103,8 +103,9 @@ if (!box) {
       div.setAttribute("data-id", id);
 
       if (m.name === name) {
-        div.style.marginLeft = "auto";
-        div.style.background = "#3b82f6";
+        div.classList.add("message", "right");
+          } else {
+        div.classList.add("message", "left");
       }
 
       // 📱 SWIPE REPLY (TEMİZ)
