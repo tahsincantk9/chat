@@ -74,3 +74,28 @@ button {
   margin-bottom:5px;
   border-radius:8px;
 }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#chatApp {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#chatBox {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.message {
+  font-size: 15px;
+  word-break: break-word;
+}
