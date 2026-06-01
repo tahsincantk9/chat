@@ -9,10 +9,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "xxx",
-  authDomain: "xxx",
-  databaseURL: "xxx",
-  projectId: "xxx"
+  apiKey: "AIzaSyBZNpGv5Yk54JFB_5U6Qr6iNx2PaPrhIFo",
+  authDomain:  "party-hub-90183.firebaseapp.com",
+  databaseURL: "https://party-hub-90183-default-rtdb.europe-west1.firebasedatabase.app/",
+  projectId: "party-hub-90183",
+  storageBucket:  "party-hub-90183.firebasestorage.app",
+  messagingSenderId: "230836884321",
+  appId: "1:230836884321:web:81b3eb36d650c18d0d6b20
 };
 
 const app = initializeApp(firebaseConfig);
