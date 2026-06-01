@@ -2,81 +2,25 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Chat App</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Chat Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="login">
+<div id="auth">
 
-  <h3>Kayıt / Giriş</h3>
+  <h2>Giriş / Kayıt</h2>
 
   <input id="email" placeholder="Email">
   <input id="password" placeholder="Şifre">
 
   <button onclick="register()">Kayıt Ol</button>
   <button onclick="login()">Giriş Yap</button>
-  
-  <div id="roomSelect" style="display:none;">
-
-  <h3>Odaya Gir</h3>
-
-  <input id="name" placeholder="Görünen İsim">
-  <input id="roomId" placeholder="Oda adı">
-
-  <button onclick="joinRoom()">
-  Odaya Gir
-  </button>
 
 </div>
 
-  
-
- 
-
-</div>
-
-  
-
-
-<!-- CHAT -->
-<div id="chatApp" style="display:none;">
-
-  <h3 id="roomText"></h3>
-
-  <div id="users"></div>
-
-  <div id="chatBox"></div>
-
-  <div id="typing"></div>
-
-  <div id="emojiBox" style="display:none;">
-    <button onclick="addEmoji('😀')">😀</button>
-    <button onclick="addEmoji('😂')">😂</button>
-    <button onclick="addEmoji('🔥')">🔥</button>
-    <button onclick="addEmoji('❤️')">❤️</button>
-  </div>
-
-  <button onclick="toggleEmoji()">😊</button>
-
-  
-  <div id="bottomBar">
-    <div id="replyBar" style="display:none;"></div>
-
-  <input id="msg" placeholder="Mesaj...">
-  <button onclick="sendMessage()">Gönder</button>
-
-</div>
-
-  <audio id="notifySound"
-  src="https://www.myinstants.com/media/sounds/notification.mp3"></audio>
-
-</div>
-
-<script type="module" src="app.js"></script>
+<script type="module" src="auth.js"></script>
 
 </body>
 </html>
