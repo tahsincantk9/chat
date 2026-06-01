@@ -73,11 +73,11 @@ body {
 }
 
 /* CHAT BOX */
-#chatBox {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-  background: #0f172a;
+#chatBox{
+  flex:1;
+  overflow-y:auto;
+  padding:10px;
+  padding-bottom:80px;
 }
 
 /* MESSAGE */
@@ -168,13 +168,14 @@ button {
   }
 }
 
-#bottomBar {
-  position: sticky;
-  bottom: 0;
-  background: #111827;
-  padding: 10px;
-  display: flex;
-  gap: 8px;
+#bottomBar{
+  position:sticky;
+  bottom:0;
+  background:#111827;
+  padding:10px;
+  display:flex;
+  gap:8px;
+  z-index:100;
 }
 
 #chatApp {
