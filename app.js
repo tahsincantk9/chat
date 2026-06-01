@@ -260,6 +260,7 @@ window.hide = function (id) {
 
 /* ADMIN PANEL */
 function showAdminPanel() {
+  if(!isAdmin) return;
 
   let panel = document.getElementById("adminPanel");
 
