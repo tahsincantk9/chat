@@ -162,7 +162,8 @@ div.addEventListener("touchcancel", cancelPress);
       div.innerHTML = `
   ${
     m.reply
-      ? `<div style="
+      ? `
+        <div style="
           font-size:12px;
           opacity:.7;
           border-left:3px solid #3b82f6;
@@ -171,34 +172,31 @@ div.addEventListener("touchcancel", cancelPress);
         ">
           ↩ ${m.reply.sender}<br>
           ${m.reply.text}
-        </div>`
+        </div>
+      `
       : ""
   }
 
   <b>${m.name}</b><br>
   ${m.text}
 
-  ${m.edited ? '<small>(düzenlendi)</small>' : ''}
+  ${m.edited ? `<small style="opacity:0.6;">(düzenlendi)</small>` : ""}
 
   ${
     m.reaction
-      ? `<div style="
+      ? `
+        <div class="reaction" style="
           margin-top:4px;
-          font-size:18px;
+          font-size:16px;
         ">
-          ${m.reaction}
-        </div>`
+          👍 ${m.reaction}
+        </div>
+      `
       : ""
   }
 `;
-      box.appendChild(div);
-    }
 
-    box.scrollTop = box.scrollHeight;
-  });
-}
-
-
+box.appendChild(div);
 
 /* 👤 USERS */
 function setOnline() {
@@ -373,15 +371,25 @@ function del(id) {
   set(ref(db, "rooms/" + roomId + "/messages/" + id), null);
 }
 
-function react(id, emoji) {
+function react(id, emoji){
 
-  set(
-    ref(
-      db,
-      "rooms/" + roomId + "/messages/" + id + "/reaction"
-    ),
-    emoji
+  const path = ref(
+    db,
+    "rooms/" + roomId + "/messages/" + id + "/reaction"
   );
+
+  onValue(path, (snap) => {
+
+    const current = snap.val();
+
+    // aynı emojiye tekrar basıldıysa sil
+    if(current === emoji){
+      set(path, null);
+    } else {
+      set(path, emoji);
+    }
+
+  }, { onlyOnce: true });
 
 }
 
