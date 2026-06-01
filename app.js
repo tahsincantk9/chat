@@ -197,6 +197,9 @@ div.addEventListener("touchcancel", cancelPress);
 `;
 
 box.appendChild(div);
+        }
+});
+}
 
 /* 👤 USERS */
 function setOnline() {
