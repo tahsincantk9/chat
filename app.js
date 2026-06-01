@@ -68,6 +68,7 @@ window.sendMessage = function () {
 
 /* 📩 MESSAGES */
 function listenMessages() {
+  ${isAdmin ? `<button onclick="deleteMsg('${id}')">🗑</button>` : ""}
 
   const box = document.getElementById("chatBox");
 
@@ -101,6 +102,7 @@ function setOnline() {
   const r = ref(db, `rooms/${roomId}/users/${name}`);
   set(r, { name, online: true });
   onDisconnect(r).set({ name, online: false });
+  <button onclick="kickUser('${user}')">🚫 At</button>
 }
 
 function listenUsers() {
@@ -161,6 +163,8 @@ function showAdminPanel() {
       overflow:auto;
       padding:10px;
     `;
+    <button onclick="deleteMsg('${id}')">🗑 Sil</button>
+    <button onclick="hideMsg('${id}')">👁 Gizle</button>
 
     document.body.appendChild(panel);
   }
@@ -172,6 +176,36 @@ function showAdminPanel() {
 
     for (let room in data) {
       panel.innerHTML += `<h4>${room}</h4>`;
+
+      <button onclick="closeRoom('${room}')">
+    ❌ Odayı Kapat
+      </button>
     }
   });
 }
+
+window.deleteMsg = function(id) {
+  set(ref(db, `rooms/${roomId}/messages/${id}`), null);
+};
+window.hideMsg = function(id) {
+  const el = document.querySelector(`[data-id="${id}"]`);
+  if (el) el.style.display = "none";
+};
+window.react = function(id, emoji) {
+
+  const path = ref(db, `rooms/${roomId}/messages/${id}/reaction`);
+
+  onValue(path, (snap) => {
+    set(path, snap.val() === emoji ? null : emoji);
+  }, { onlyOnce: true });
+};
+window.closeRoom = function(room) {
+
+  if (!confirm("Oda kapatılsın mı?")) return;
+
+  set(ref(db, `rooms/${room}`), null);
+};
+window.kickUser = function(user) {
+
+  set(ref(db, `rooms/${roomId}/users/${user}`), null);
+};
