@@ -349,7 +349,7 @@ window.showMessageOptions = function (id, msg) {
   if (msg.name === name) {
     options = [
       { t: "✏️ Düzenle", a: () => editMessage(id, msg) },
-      { t: "🗑 Sil", a: () => del(id, msg) }
+      { t: "🗑 Sil", a: () => del(id, msg) },
       { t: "❌ Gizle", a: () => hide(id) }
     ];
   } else {
