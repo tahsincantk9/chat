@@ -167,3 +167,17 @@ button {
     width: 65%;
   }
 }
+
+#bottomBar {
+  position: sticky;
+  bottom: 0;
+  background: #111827;
+  padding: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+#chatApp {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
