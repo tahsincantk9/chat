@@ -18,6 +18,17 @@ const firebaseConfig = {
   storageBucket: "chat-1fcbc.firebasestorage.app",
   messagingSenderId: "1052129961309",
   appId: "1:1052129961309:web:557082ecbc6bae0e69f4b4"
+  
+import { getAuth, signInWithEmailAndPassword } 
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import { get } 
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const auth = getAuth(app);
+
+let uid = "";
+let isAdmin = false;
 };
 
 const app = initializeApp(firebaseConfig);
@@ -42,31 +53,34 @@ window.joinRoom = function () {
 roomId = document.getElementById("roomId").value.trim();
 
 /* 👇 BURAYA EKLE */
-if (adminUsers.includes(name)) {
-  isAdmin = true;
-  setTimeout(showAdminPanel, 500);
-} else {
-  isAdmin = false;
-}
+window.login = function () {
 
-  if (!roomId || !name) return alert("Eksik bilgi");
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
-  isAdmin = adminUsers.includes(name);
+  signInWithEmailAndPassword(auth, email, password)
+    .then(async (userCredential) => {
 
-  document.getElementById("login").style.display = "none";
-  document.getElementById("chatApp").style.display = "flex";
+      const user = userCredential.user;
 
-  document.getElementById("roomText").innerText = "🏠 " + roomId;
+      uid = user.uid;
+      name = user.email;
 
-  setOnline();
-  listenMessages();
-  listenUsers();
-  listenTyping();
-  initTyping();
+      await checkAdmin(); // admin kontrol
 
-  if (isAdmin) setTimeout(showAdminPanel, 500);
+      document.getElementById("login").style.display = "none";
+      document.getElementById("chatApp").style.display = "flex";
+
+      setOnline();
+      listenMessages();
+      listenUsers();
+      listenTyping();
+      initTyping();
+    })
+    .catch(err => {
+      alert("Hata: " + err.message);
+    });
 };
-
 /* 💬 SEND */
 window.sendMessage = async function () {
 
@@ -337,4 +351,11 @@ window.cancelReply = function () {
 function cleanupMessages() {
   const msgRef = ref(db, `rooms/${roomId}/messages`);
   onValue(msgRef, () => {}, { onlyOnce: true });
+}
+
+  async function checkAdmin(){
+
+  const snap = await get(ref(db, "admins/" + uid));
+
+  isAdmin = snap.exists();
 }
