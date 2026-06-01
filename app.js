@@ -1,4 +1,3 @@
-console.log("JS çalışıyor");
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getDatabase,
@@ -69,7 +68,7 @@ window.sendMessage = function () {
 
 /* 📩 MESSAGES */
 function listenMessages() {
-  ${isAdmin ? `<button onclick="deleteMsg('${id}')">🗑</button>` : ""}
+  
 
   const box = document.getElementById("chatBox");
 
@@ -90,6 +89,7 @@ function listenMessages() {
       div.innerHTML = `
         ${m.reply ? `<small>↩ ${m.reply.sender}: ${m.reply.text}</small><br>` : ""}
         <b>${m.name}</b><br>
+        ${isAdmin ? `<button onclick="deleteMsg('${id}')">🗑</button>` : ""}
         ${m.text}
       `;
 
