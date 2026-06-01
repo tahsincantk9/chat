@@ -206,7 +206,7 @@ div.addEventListener("touchcancel", cancelPress);
 `;
 
 box.appendChild(div);
-        }
+}
 });
 }
 
