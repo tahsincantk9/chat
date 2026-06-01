@@ -22,6 +22,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+const adminUsers = ["admin", "ghost", "root"];
+let isAdmin = false;
+
 /* STATE */
 let roomId = "";
 let name = "";
@@ -32,6 +35,12 @@ window.joinRoom = function () {
 
   roomId = document.getElementById("roomId").value.trim();
   name = document.getElementById("name").value.trim();
+  if (adminUsers.includes(name)) {
+  isAdmin = true;
+  setTimeout(showAdminPanel, 500);
+} else {
+  isAdmin = false;
+}
 
   if (!roomId || !name) return alert("Eksik bilgi");
 
@@ -340,7 +349,7 @@ window.showMessageOptions = function (id, msg) {
   if (msg.name === name) {
     options = [
       { t: "✏️ Düzenle", a: () => editMessage(id, msg) },
-      { t: "🗑 Sil", a: () => del(id) },
+      { t: "🗑 Sil", a: () => del(id, msg) }
       { t: "❌ Gizle", a: () => hide(id) }
     ];
   } else {
@@ -370,10 +379,16 @@ window.showMessageOptions = function (id, msg) {
 };
 
 /* DELETE */
-function del(id) {
-  set(ref(db, "rooms/" + roomId + "/messages/" + id), null);
-}
+function del(id, msg) {
 
+  const isOwner = msg.name === name;
+
+  if (isOwner || isAdmin) {
+    set(ref(db, "rooms/" + roomId + "/messages/" + id), null);
+  } else {
+    alert("Yetkin yok");
+  }
+}
 function react(id, emoji){
 
   const path = ref(
