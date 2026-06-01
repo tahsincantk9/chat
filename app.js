@@ -519,3 +519,4 @@ onValue(ref(db, "rooms"), (snap) => {
     }
   }
 });
+}
