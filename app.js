@@ -51,7 +51,7 @@ window.login = function () {
       await checkAdmin();
 
       document.getElementById("login").style.display = "none";
-      document.getElementById("chatApp").style.display = "flex";
+      document.getElementById("roomSelect").style.display = "block";
 
       listenMessages();
       setOnline();
@@ -68,6 +68,9 @@ async function checkAdmin() {
 
 window.joinRoom = function () {
   roomId = document.getElementById("roomId").value.trim();
+  name = document.getElementById("name").value.trim();
+
+  if(!name) return alert("İsim gir");
 
   document.getElementById("login").style.display = "none";
   document.getElementById("chatApp").style.display = "flex";
