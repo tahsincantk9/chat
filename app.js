@@ -171,6 +171,10 @@ box.innerHTML += data[u].online?"🟢 "+u+" ":"⚫ "+u+" ";
 
 /* TYPING */
 function listenTyping(){
+if(isAdmin){
+  showAdminPanel();
+}
+
 const input=document.getElementById("msg");
 
 input.addEventListener("input",()=>{
@@ -273,4 +277,96 @@ window.showMsgMenu = function(id, m, el) {
   setTimeout(() => menu.remove(), 4000);
 };
 
+window.adminDelete = function(room,id){
 
+  set(
+    ref(db,`rooms/${room}/messages/${id}`),
+    null
+  );
+
+};
+
+/* ADMIN PANEL */
+
+function showAdminPanel() {
+
+  let panel = document.getElementById("adminPanel");
+
+  if(!panel){
+
+    panel = document.createElement("div");
+    panel.id = "adminPanel";
+
+    panel.style = `
+      position:fixed;
+      right:0;
+      top:0;
+      width:280px;
+      height:100vh;
+      background:#111827;
+      color:white;
+      overflow:auto;
+      padding:10px;
+      z-index:9999;
+      border-left:1px solid #333;
+    `;
+
+    document.body.appendChild(panel);
+  }
+
+  onValue(ref(db,"rooms"),(snap)=>{
+
+    const data = snap.val();
+
+    panel.innerHTML = "<h3>🛡 Admin Panel</h3>";
+
+    if(!data) return;
+
+    for(let room in data){
+
+      panel.innerHTML += `
+        <hr>
+        <h4>🏠 ${room}</h4>
+        <button onclick="closeRoom('${room}')">
+          ❌ Odayı Kapat
+        </button>
+        <br><br>
+      `;
+
+      const messages = data[room].messages;
+
+      if(!messages) continue;
+
+      for(let id in messages){
+
+        const m = messages[id];
+
+        panel.innerHTML += `
+          <div style="
+            border:1px solid #333;
+            margin:5px 0;
+            padding:5px;
+          ">
+            <b>${m.name}</b><br>
+            ${m.text}<br>
+
+            <button onclick="adminDelete('${room}','${id}')">
+              🗑 Sil
+            </button>
+          </div>
+        `;
+      }
+    }
+  });
+}
+
+window.closeRoom = function(room){
+
+  if(!confirm(room + " kapatılsın mı?"))
+    return;
+
+  set(
+    ref(db,`rooms/${room}`),
+    null
+  );
+};
