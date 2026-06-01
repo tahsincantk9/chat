@@ -25,7 +25,7 @@ let name = "";
 let roomId = "";
 let replyMessage = null;
 
-const adminUsers = ["admin", "root", "ghost"];
+const adminUsers = ["TAHSİNESMA"];
 let isAdmin = false;
 
 /* 🚪 JOIN */
