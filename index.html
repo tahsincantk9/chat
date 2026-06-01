@@ -1,24 +1,20 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>Chat App</title>
-  <link rel="stylesheet" href="style.css">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Chat</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <!-- LOGIN -->
 <div id="login">
-  <h3>Odaya Giriş</h3>
-
   <input id="name" placeholder="İsim">
-  <input id="roomId" placeholder="Oda adı">
-
-  <button onclick="joinRoom()">Giriş Yap</button>
+  <input id="roomId" placeholder="Oda">
+  <button onclick="joinRoom()">Giriş</button>
 </div>
-<div id="adminPanel"></div>
+
 <!-- CHAT -->
 <div id="chatApp" style="display:none;">
 
@@ -28,21 +24,10 @@
   <div id="chatBox"></div>
   <div id="typing"></div>
 
-  <div id="replyBar" style="display:none;"></div>
+  <div id="replyBar"></div>
 
-  <div id="emojiBox" style="display:none;">
-    <button onclick="addEmoji('😀')">😀</button>
-    <button onclick="addEmoji('😂')">😂</button>
-    <button onclick="addEmoji('🔥')">🔥</button>
-    <button onclick="addEmoji('❤️')">❤️</button>
-  </div>
-
-  <button onclick="toggleEmoji()">😊</button>
-
-  <div id="bottomBar">
-    <input id="msg" placeholder="Mesaj...">
-    <button onclick="sendMessage()">Gönder</button>
-  </div>
+  <input id="msg" placeholder="Mesaj">
+  <button onclick="sendMessage()">Gönder</button>
 
 </div>
 
