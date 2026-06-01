@@ -84,7 +84,37 @@ const m=data[id];
 const div=document.createElement("div");
 div.className="message "+(m.name===name?"right":"left");
 
+div.addEventListener("touchend", () => clearTimeout(pressTimer));
+
 div.setAttribute("data-id",id);
+
+let startX = 0;
+let pressTimer;
+
+// LONG PRESS
+div.addEventListener("touchstart", () => {
+  pressTimer = setTimeout(() => {
+    showMsgMenu(id, m);
+  }, 500);
+});
+
+// LONG PRESS CANCEL
+div.addEventListener("touchend", () => {
+  clearTimeout(pressTimer);
+});
+
+// SWIPE RIGHT REPLY
+div.addEventListener("touchstart", (e) => {
+  startX = e.touches[0].clientX;
+});
+
+div.addEventListener("touchmove", (e) => {
+  let diff = e.touches[0].clientX - startX;
+
+  if (diff > 80) {
+    replyMsg(id);
+  }
+});
 
 div.innerHTML=`
 
@@ -145,27 +175,51 @@ set(ref(db,`rooms/${roomId}/typing/${name}`),{typing:false});
 }
 
 /* REPLY */
-window.replyMsg = function(id){
-get(ref(db,`rooms/${roomId}/messages/${id}`))
-.then(snap=>{
-replyMessage={
-sender:snap.val().name,
-text:snap.val().text
-};
-});
+window.replyMsg = function(id) {
+
+  get(ref(db, `rooms/${roomId}/messages/${id}`)).then(snap => {
+
+    const m = snap.val();
+
+    replyMessage = {
+      sender: m.name,
+      text: m.text
+    };
+
+    document.getElementById("replyBar").innerText =
+      "↩ " + m.name + ": " + m.text;
+  });
 };
 
 /* EDIT */
-window.editMsg = function(id){
-const newText=prompt("Edit:");
-if(!newText) return;
+window.editMsg = function(id) {
 
-set(ref(db,`rooms/${roomId}/messages/${id}/text`),newText);
+  get(ref(db, `rooms/${roomId}/messages/${id}`)).then(snap => {
+
+    const m = snap.val();
+
+    if (!canEdit(m)) return alert("Yetkin yok");
+
+    const newText = prompt("Edit:");
+
+    if (!newText) return;
+
+    set(ref(db, `rooms/${roomId}/messages/${id}/text`), newText);
+    set(ref(db, `rooms/${roomId}/messages/${id}/edited`), true);
+  });
 };
 
 /* DELETE */
-window.deleteMsg=function(id){
-set(ref(db,`rooms/${roomId}/messages/${id}`),null);
+window.deleteMsg = function(id) {
+
+  get(ref(db, `rooms/${roomId}/messages/${id}`)).then(snap => {
+
+    const m = snap.val();
+
+    if (!canEdit(m)) return alert("Yetkin yok");
+
+    set(ref(db, `rooms/${roomId}/messages/${id}`), null);
+  });
 };
 
 /* HIDE */
@@ -178,3 +232,36 @@ if(el) el.style.display="none";
 window.kickUser=function(user){
 set(ref(db,`rooms/${roomId}/users/${user}`),null);
 };
+
+function canEdit(m) {
+  return m.name === name || isAdmin;
+}
+
+window.showMsgMenu = function(id, m, el) {
+
+  const menu = document.createElement("div");
+
+  menu.style = `
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    background:#111827;
+    padding:10px;
+    display:flex;
+    gap:10px;
+    z-index:9999;
+  `;
+
+  menu.innerHTML = `
+    <button onclick="deleteMsg('${id}')">🗑 Sil</button>
+    <button onclick="hideMsg('${id}')">👁 Gizle</button>
+    <button onclick="replyMsg('${id}')">↩ Yanıtla</button>
+  `;
+
+  document.body.appendChild(menu);
+
+  setTimeout(() => menu.remove(), 4000);
+};
+
+
