@@ -490,24 +490,32 @@ function showAdminPanel(){
 
   panel.style.display = "block";
 
-  onValue(ref(db, "rooms/" + roomId + "/messages"), (snap) => {
+onValue(ref(db, "rooms"), (snap) => {
 
-    const data = snap.val();
+  const data = snap.val();
 
-    panel.innerHTML = "<h3>Admin Panel</h3>";
+  panel.innerHTML = "<h3>All Rooms</h3>";
 
-    if(!data) return;
+  if(!data) return;
 
-    for(let id in data){
-      const m = data[id];
+  for(let room in data){
+
+    panel.innerHTML += `<h4>🏠 ${room}</h4>`;
+
+    const messages = data[room].messages;
+
+    if(!messages) continue;
+
+    for(let id in messages){
+
+      const m = messages[id];
 
       panel.innerHTML += `
-        <div style="border-bottom:1px solid #333; padding:6px;">
+        <div style="border-bottom:1px solid #333; padding:5px;">
           <b>${m.name}</b><br>
           ${m.text}
         </div>
       `;
     }
-
-  });
-}
+  }
+});
