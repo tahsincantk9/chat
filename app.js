@@ -24,7 +24,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 /* ADMIN */
-const adminUsers = ["admin", "ghost", "root"];
+const adminUsers = ["eliftahsin"];
 let isAdmin = false;
 
 /* STATE */
@@ -37,6 +37,17 @@ window.joinRoom = function () {
 
   roomId = document.getElementById("roomId").value.trim();
   name = document.getElementById("name").value.trim();
+
+  name = document.getElementById("name").value.trim();
+roomId = document.getElementById("roomId").value.trim();
+
+/* 👇 BURAYA EKLE */
+if (adminUsers.includes(name)) {
+  isAdmin = true;
+  setTimeout(showAdminPanel, 500);
+} else {
+  isAdmin = false;
+}
 
   if (!roomId || !name) return alert("Eksik bilgi");
 
