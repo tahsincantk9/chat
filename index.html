@@ -2,53 +2,51 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Chat Login</title>
+  <title>Chat App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div id="auth">
-
+<!-- LOGIN -->
 <div id="login">
+  <h3>Giriş</h3>
 
-  <h3>Giriş / Kayıt</h3>
-
-  <input id="email" placeholder="Email">
-  <input id="password" placeholder="Şifre">
-
-  <button onclick="login()">Giriş Yap</button>
-  <button onclick="register()">Kayıt Ol</button>
-
-</div>
-
-<div id="roomSelect" style="display:none;">
-
-  <h3>Odaya Gir</h3>
-
-  <input id="name" placeholder="Görünen isim">
+  <input id="name" placeholder="İsim">
   <input id="roomId" placeholder="Oda adı">
 
-  <button onclick="joinRoom()">Giriş</button>
+  <button onclick="joinRoom()">Odaya Gir</button>
+</div>
 
-  <div id="chatApp" style="display:none;">
+<!-- CHAT -->
+<div id="chatApp" style="display:none;">
+
+  <h3 id="roomText"></h3>
 
   <div id="users"></div>
+  <div id="typing"></div>
 
   <div id="chatBox"></div>
 
-  <div id="typing"></div>
+  <div id="replyBar" style="display:none;"></div>
 
-  <div id="replyBar"></div>
+  <div id="emojiBox" style="display:none;">
+    <button onclick="addEmoji('😀')">😀</button>
+    <button onclick="addEmoji('😂')">😂</button>
+    <button onclick="addEmoji('🔥')">🔥</button>
+    <button onclick="addEmoji('❤️')">❤️</button>
+  </div>
 
-  <input id="msg">
-  <button onclick="sendMessage()">Gönder</button>
+  <button onclick="toggleEmoji()">😊</button>
+
+  <div id="bottomBar">
+    <input id="msg" placeholder="Mesaj...">
+    <button onclick="sendMessage()">Gönder</button>
+  </div>
 
 </div>
 
-</div>
-
-<script type="module" src="auth.js"></script>
-
+<script type="module" src="app.js"></script>
 </body>
 </html>
