@@ -1,19 +1,21 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-  getDatabase,
-  ref,
-  push,
-  set,
-  onValue,
-  onDisconnect
+getDatabase,
+ref,
+push,
+set,
+onValue,
+onDisconnect,
+get
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBZNpGv5Yk54JFB_5U6Qr6iNx2PaPrhIFo",
   authDomain:  "party-hub-90183.firebaseapp.com",
   databaseURL: "https://party-hub-90183-default-rtdb.europe-west1.firebasedatabase.app/",
-  projectId: "party-hub-90183",
+  projectId: "party-hub-90183"
   
+
 };
 
 const app = initializeApp(firebaseConfig);
@@ -23,190 +25,156 @@ let name = "";
 let roomId = "";
 let replyMessage = null;
 
-const adminUsers = ["TAHSİNESMA"];
+const adminUsers = ["admin"];
 let isAdmin = false;
 
-/* 🚪 JOIN */
+/* JOIN */
 window.joinRoom = function () {
 
-  name = document.getElementById("name").value.trim();
-  roomId = document.getElementById("roomId").value.trim();
+name = document.getElementById("name").value.trim();
+roomId = document.getElementById("roomId").value.trim();
 
-  if (!name || !roomId) return alert("Eksik bilgi");
+if(!name || !roomId) return alert("Eksik");
 
-  isAdmin = adminUsers.includes(name);
+isAdmin = adminUsers.includes(name);
 
-  document.getElementById("login").style.display = "none";
-  document.getElementById("chatApp").style.display = "block";
+document.getElementById("login").style.display="none";
+document.getElementById("chatApp").style.display="block";
 
-  document.getElementById("roomText").innerText = roomId;
+document.getElementById("roomText").innerText = roomId;
 
-  setOnline();
-  listenMessages();
-  listenUsers();
-  listenTyping();
-
-  if (isAdmin) showAdminPanel();
+setOnline();
+listenMessages();
+listenUsers();
+listenTyping();
 };
 
-/* 💬 SEND */
+/* SEND */
 window.sendMessage = function () {
 
-  const msg = document.getElementById("msg").value;
-  if (!msg) return;
+const msg = document.getElementById("msg").value;
+if(!msg) return;
 
-  push(ref(db, `rooms/${roomId}/messages`), {
-    name,
-    text: msg,
-    time: Date.now(),
-    reply: replyMessage
-  });
+push(ref(db, `rooms/${roomId}/messages`), {
+name,
+text: msg,
+time: Date.now(),
+reply: replyMessage
+});
 
-  document.getElementById("msg").value = "";
-  replyMessage = null;
+document.getElementById("msg").value="";
+replyMessage=null;
 };
 
-/* 📩 MESSAGES */
+/* MESSAGES */
 function listenMessages() {
-  
 
-  const box = document.getElementById("chatBox");
+onValue(ref(db, `rooms/${roomId}/messages`), (snap)=>{
 
-  onValue(ref(db, `rooms/${roomId}/messages`), (snap) => {
+const box=document.getElementById("chatBox");
+box.innerHTML="";
 
-    box.innerHTML = "";
+const data=snap.val();
+if(!data) return;
 
-    const data = snap.val();
-    if (!data) return;
+for(let id in data){
 
-    for (let id in data) {
+const m=data[id];
 
-      const m = data[id];
+const div=document.createElement("div");
+div.className="message "+(m.name===name?"right":"left");
 
-      const div = document.createElement("div");
-      div.className = "message " + (m.name === name ? "right" : "left");
+div.setAttribute("data-id",id);
 
-      div.innerHTML = `
-        ${m.reply ? `<small>↩ ${m.reply.sender}: ${m.reply.text}</small><br>` : ""}
-        <b>${m.name}</b><br>
-        ${isAdmin ? `<button onclick="deleteMsg('${id}')">🗑</button>` : ""}
-        ${m.text}
-      `;
+div.innerHTML=`
 
-      box.appendChild(div);
-    }
-  });
+${m.reply?`↩ ${m.reply.sender}: ${m.reply.text}<br>`:""}
+<b>${m.name}</b><br>
+${m.text}
+
+<br>
+
+${isAdmin?`
+<button onclick="deleteMsg('${id}')">🗑</button>
+<button onclick="hideMsg('${id}')">👁</button>
+<button onclick="kickUser('${m.name}')">🚫</button>
+`: ""}
+
+<button onclick="replyMsg('${id}')">↩</button>
+<button onclick="editMsg('${id}')">✏</button>
+
+`;
+
+box.appendChild(div);
 }
 
-/* 👤 USERS */
-function setOnline() {
-  const r = ref(db, `rooms/${roomId}/users/${name}`);
-  set(r, { name, online: true });
-  onDisconnect(r).set({ name, online: false });
-  <button onclick="kickUser('${user}')">🚫 At</button>
+});
 }
 
-function listenUsers() {
-  onValue(ref(db, `rooms/${roomId}/users`), (snap) => {
-    const data = snap.val();
-    const box = document.getElementById("users");
-
-    box.innerHTML = "";
-
-    for (let u in data) {
-      box.innerHTML += data[u].online
-        ? "🟢 " + data[u].name + " "
-        : "⚫ " + data[u].name + " ";
-    }
-  });
+/* USERS */
+function setOnline(){
+set(ref(db,`rooms/${roomId}/users/${name}`),{name,online:true});
+onDisconnect(ref(db,`rooms/${roomId}/users/${name}`)).set({name,online:false});
 }
 
-/* ✍ typing */
-function listenTyping() {
-  const input = document.getElementById("msg");
+function listenUsers(){
+onValue(ref(db,`rooms/${roomId}/users`),(snap)=>{
+const box=document.getElementById("users");
+box.innerHTML="";
+const data=snap.val();
+if(!data) return;
 
-  input.addEventListener("input", () => {
-    set(ref(db, `rooms/${roomId}/typing/${name}`), { typing: true });
-
-    setTimeout(() => {
-      set(ref(db, `rooms/${roomId}/typing/${name}`), { typing: false });
-    }, 1000);
-  });
+for(let u in data){
+box.innerHTML += data[u].online?"🟢 "+u+" ":"⚫ "+u+" ";
+}
+});
 }
 
-/* 😀 emoji */
-window.toggleEmoji = function () {
-  const box = document.getElementById("emojiBox");
-  box.style.display = box.style.display === "none" ? "block" : "none";
-};
+/* TYPING */
+function listenTyping(){
+const input=document.getElementById("msg");
 
-window.addEmoji = function (e) {
-  document.getElementById("msg").value += e;
-};
+input.addEventListener("input",()=>{
+set(ref(db,`rooms/${roomId}/typing/${name}`),{typing:true});
 
-/* 🛡 ADMIN PANEL */
-function showAdminPanel() {
+setTimeout(()=>{
+set(ref(db,`rooms/${roomId}/typing/${name}`),{typing:false});
+},1000);
 
-  let panel = document.getElementById("adminPanel");
-
-  if (!panel) {
-    panel = document.createElement("div");
-    panel.id = "adminPanel";
-
-    panel.style = `
-      position:fixed;
-      right:0;
-      top:0;
-      width:250px;
-      height:100vh;
-      background:#111;
-      color:white;
-      overflow:auto;
-      padding:10px;
-    `;
-    <button onclick="deleteMsg('${id}')">🗑 Sil</button>
-    <button onclick="hideMsg('${id}')">👁 Gizle</button>
-
-    document.body.appendChild(panel);
-  }
-
-  onValue(ref(db, "rooms"), (snap) => {
-
-    const data = snap.val();
-    panel.innerHTML = "<h3>ADMIN</h3>";
-
-    for (let room in data) {
-      panel.innerHTML += `<h4>${room}</h4>`;
-
-      <button onclick="closeRoom('${room}')">
-    ❌ Odayı Kapat
-      </button>
-    }
-  });
+});
 }
 
-window.deleteMsg = function(id) {
-  set(ref(db, `rooms/${roomId}/messages/${id}`), null);
+/* REPLY */
+window.replyMsg = function(id){
+get(ref(db,`rooms/${roomId}/messages/${id}`))
+.then(snap=>{
+replyMessage={
+sender:snap.val().name,
+text:snap.val().text
 };
-window.hideMsg = function(id) {
-  const el = document.querySelector(`[data-id="${id}"]`);
-  if (el) el.style.display = "none";
+});
 };
-window.react = function(id, emoji) {
 
-  const path = ref(db, `rooms/${roomId}/messages/${id}/reaction`);
+/* EDIT */
+window.editMsg = function(id){
+const newText=prompt("Edit:");
+if(!newText) return;
 
-  onValue(path, (snap) => {
-    set(path, snap.val() === emoji ? null : emoji);
-  }, { onlyOnce: true });
+set(ref(db,`rooms/${roomId}/messages/${id}/text`),newText);
 };
-window.closeRoom = function(room) {
 
-  if (!confirm("Oda kapatılsın mı?")) return;
-
-  set(ref(db, `rooms/${room}`), null);
+/* DELETE */
+window.deleteMsg=function(id){
+set(ref(db,`rooms/${roomId}/messages/${id}`),null);
 };
-window.kickUser = function(user) {
 
-  set(ref(db, `rooms/${roomId}/users/${user}`), null);
+/* HIDE */
+window.hideMsg=function(id){
+const el=document.querySelector(`[data-id="${id}"]`);
+if(el) el.style.display="none";
+};
+
+/* KICK */
+window.kickUser=function(user){
+set(ref(db,`rooms/${roomId}/users/${user}`),null);
 };
