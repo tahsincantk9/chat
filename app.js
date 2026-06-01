@@ -466,5 +466,48 @@ window.cancelReply = function(){
     .style.display = "none";
 }
 
+function showAdminPanel(){
 
+  let panel = document.getElementById("adminPanel");
 
+  if(!panel){
+    panel = document.createElement("div");
+    panel.id = "adminPanel";
+
+    panel.style.position = "fixed";
+    panel.style.right = "0";
+    panel.style.top = "0";
+    panel.style.width = "280px";
+    panel.style.height = "100vh";
+    panel.style.background = "#111827";
+    panel.style.color = "white";
+    panel.style.overflow = "auto";
+    panel.style.padding = "10px";
+    panel.style.zIndex = "9999";
+
+    document.body.appendChild(panel);
+  }
+
+  panel.style.display = "block";
+
+  onValue(ref(db, "rooms/" + roomId + "/messages"), (snap) => {
+
+    const data = snap.val();
+
+    panel.innerHTML = "<h3>Admin Panel</h3>";
+
+    if(!data) return;
+
+    for(let id in data){
+      const m = data[id];
+
+      panel.innerHTML += `
+        <div style="border-bottom:1px solid #333; padding:6px;">
+          <b>${m.name}</b><br>
+          ${m.text}
+        </div>
+      `;
+    }
+
+  });
+}
