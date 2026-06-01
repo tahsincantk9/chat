@@ -10,13 +10,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 import {
-getAuth,
-createUserWithEmailAndPassword,
-signInWithEmailAndPassword
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-
-
+/* FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyDqpzbGP9NIEpqt19ZD8F63Hb9U81XNmj4",
   authDomain: "chat-1fcbc.firebaseapp.com",
@@ -31,16 +30,18 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
+/* STATE */
 let uid = "";
 let name = "";
 let roomId = "";
 let isAdmin = false;
 let replyMessage = null;
 
+/* LOGIN */
 window.login = function () {
 
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
 
   signInWithEmailAndPassword(auth, email, password)
     .then(async (user) => {
@@ -53,48 +54,64 @@ window.login = function () {
       document.getElementById("login").style.display = "none";
       document.getElementById("roomSelect").style.display = "block";
 
-      listenMessages();
-      setOnline();
-      listenTyping();
-
     })
     .catch(e => alert(e.message));
 };
 
+/* REGISTER */
+window.register = function () {
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(() => alert("Kayıt başarılı"))
+    .catch(err => alert(err.message));
+};
+
+/* ADMIN CHECK */
 async function checkAdmin() {
   const snap = await get(ref(db, "admins/" + uid));
   isAdmin = snap.exists();
 }
 
+/* JOIN ROOM */
 window.joinRoom = function () {
+
   roomId = document.getElementById("roomId").value.trim();
   name = document.getElementById("name").value.trim();
 
-  if(!name) return alert("İsim gir");
+  if (!roomId) return alert("Oda gir");
+  if (!name) return alert("İsim gir");
 
-  document.getElementById("login").style.display = "none";
+  document.getElementById("roomSelect").style.display = "none";
   document.getElementById("chatApp").style.display = "flex";
 
-  listenMessages();
   setOnline();
+  listenMessages();
+  listenTyping();
 };
 
+/* SEND MESSAGE */
 window.sendMessage = function () {
 
-  const msg = document.getElementById("msg").value;
+  const input = document.getElementById("msg");
+  const msg = input.value.trim();
+
   if (!msg) return;
 
   push(ref(db, `rooms/${roomId}/messages`), {
     name,
     text: msg,
     time: Date.now(),
-    reply: replyMessage
+    reply: replyMessage || null
   });
 
-  document.getElementById("msg").value = "";
+  input.value = "";
   replyMessage = null;
 };
 
+/* MESSAGES */
 function listenMessages() {
 
   const box = document.getElementById("chatBox");
@@ -117,7 +134,7 @@ function listenMessages() {
 
       if (m.reply) {
         html += `
-          <div style="font-size:12px;opacity:.7;border-left:3px solid #3b82f6;padding-left:5px;margin-bottom:5px">
+          <div class="reply">
             ↩ ${m.reply.sender}<br>${m.reply.text}
           </div>
         `;
@@ -128,14 +145,10 @@ function listenMessages() {
         ${m.text}
       `;
 
-      if (m.edited) html += `<small>(düzenlendi)</small>`;
-
-      if (m.reaction) {
-        html += `<div>👍 ${m.reaction}</div>`;
-      }
+      if (m.reaction) html += `<div>👍 ${m.reaction}</div>`;
 
       html += `
-        <div style="margin-top:5px">
+        <div>
           <button onclick="react('${id}','❤️')">❤️</button>
           <button onclick="react('${id}','😂')">😂</button>
           <button onclick="reply('${id}')">↩</button>
@@ -144,7 +157,6 @@ function listenMessages() {
       `;
 
       div.innerHTML = html;
-
       box.appendChild(div);
     }
 
@@ -152,33 +164,35 @@ function listenMessages() {
   });
 }
 
+/* REACT */
 window.react = function (id, emoji) {
 
-  const path = ref(db, `rooms/${roomId}/messages/${id}/reaction`);
+  const r = ref(db, `rooms/${roomId}/messages/${id}/reaction`);
 
-  onValue(path, (snap) => {
-    set(path, snap.val() === emoji ? null : emoji);
+  onValue(r, (snap) => {
+    set(r, snap.val() === emoji ? null : emoji);
   }, { onlyOnce: true });
 };
 
+/* REPLY */
 window.reply = function (id) {
 
-  const msgRef = ref(db, `rooms/${roomId}/messages/${id}`);
+  get(ref(db, `rooms/${roomId}/messages/${id}`))
+    .then(snap => {
 
-  get(msgRef).then(snap => {
+      const m = snap.val();
 
-    const m = snap.val();
+      replyMessage = {
+        sender: m.name,
+        text: m.text
+      };
 
-    replyMessage = {
-      sender: m.name,
-      text: m.text
-    };
-
-    document.getElementById("replyBar").innerText =
-      "↩ " + m.name + ": " + m.text;
-  });
+      document.getElementById("replyBar").innerText =
+        "↩ " + m.name + ": " + m.text;
+    });
 };
 
+/* TYPING */
 function listenTyping() {
 
   const input = document.getElementById("msg");
@@ -194,42 +208,19 @@ function listenTyping() {
         typing: false
       });
     }, 1000);
-
   });
 }
 
+/* ONLINE */
 function setOnline() {
 
   const r = ref(db, `rooms/${roomId}/users/${name}`);
 
   set(r, { name, online: true });
-
   onDisconnect(r).set({ name, online: false });
 }
 
+/* DELETE */
 window.delMsg = function (id) {
   set(ref(db, `rooms/${roomId}/messages/${id}`), null);
 };
-
-window.register = function () {
-
-const email =
-document.getElementById("email").value;
-
-const password =
-document.getElementById("password").value;
-
-createUserWithEmailAndPassword(
-auth,
-email,
-password
-)
-.then(() => {
-alert("Kayıt başarılı");
-})
-.catch(err => {
-alert(err.message);
-});
-
-};
-
