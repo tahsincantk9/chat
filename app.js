@@ -27,8 +27,7 @@ const adminUsers = ["TAHSİNESMA"];
 let isAdmin = false;
 
 /* 🚪 JOIN */
-window.joinRoom = function () {}
-  
+window.joinRoom = function () {
 
   name = document.getElementById("name").value.trim();
   roomId = document.getElementById("roomId").value.trim();
