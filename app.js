@@ -30,6 +30,8 @@ let isAdmin = false;
 
 /* 🚪 JOIN */
 window.joinRoom = function () {
+  console.log("joinRoom çalıştı");
+};
 
   name = document.getElementById("name").value.trim();
   roomId = document.getElementById("roomId").value.trim();
