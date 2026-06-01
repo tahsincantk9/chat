@@ -10,9 +10,11 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 import {
-  getAuth,
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyDqpzbGP9NIEpqt19ZD8F63Hb9U81XNmj4",
@@ -204,3 +206,26 @@ function setOnline() {
 window.delMsg = function (id) {
   set(ref(db, `rooms/${roomId}/messages/${id}`), null);
 };
+
+window.register = function () {
+
+const email =
+document.getElementById("email").value;
+
+const password =
+document.getElementById("password").value;
+
+createUserWithEmailAndPassword(
+auth,
+email,
+password
+)
+.then(() => {
+alert("Kayıt başarılı");
+})
+.catch(err => {
+alert(err.message);
+});
+
+};
+
