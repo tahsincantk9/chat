@@ -69,27 +69,36 @@ replyMessage=null;
 /* MESSAGES */
 function listenMessages() {
 
-onValue(ref(db, `rooms/${roomId}/messages`), (snap)=>{
+  const box = document.getElementById("chatBox");
 
-const box=document.getElementById("chatBox");
-box.innerHTML="";
+  onValue(ref(db, `rooms/${roomId}/messages`), (snap) => {
 
-const data=snap.val();
-if(!data) return;
+    const data = snap.val();
+    box.innerHTML = "";
 
-for(let id in data){
+    if (!data) return;
 
-const m=data[id];
+    Object.entries(data).forEach(([id, m]) => {
 
-const div=document.createElement("div");
-div.className="message "+(m.name===name?"right":"left");
+      const div = document.createElement("div");
+      div.className = "message " + (m.name === name ? "right" : "left");
+      div.setAttribute("data-id", id);
 
-div.addEventListener("touchend", () => clearTimeout(pressTimer));
+      div.innerHTML = `
+        <b>${m.name}</b><br>
+        ${m.text}
+      `;
 
-div.setAttribute("data-id",id);
+      box.appendChild(div);
+    });
 
-let startX = 0;
-let pressTimer;
+    // 🔥 HER MESAJ GELİNCE OTOMATİK AŞAĞI
+    box.scrollTop = box.scrollHeight;
+
+  }, {
+    onlyOnce: false
+  });
+}
 
 // LONG PRESS
 div.addEventListener("touchstart", () => {
