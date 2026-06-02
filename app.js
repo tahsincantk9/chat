@@ -131,14 +131,14 @@ function listenMessages() {
 
       div.innerHTML = `
   
-      <b>${m.name}</b><br>
-      ${m.text}
+        <b>${m.name}</b><br>
+        ${m.text}
 
-      ${m.reaction ? `
-        <div class="reaction">
-          ${m.reaction}
-        </div>
-      ` : ""}
+        ${m.reaction ? `
+          <div class="reaction">
+            ${m.reaction}
+          </div>
+       ` : ""}
 
   ${(m.name === name || isAdmin) ? `
     <button onclick="deleteMsg('${id}')">🗑</button>
