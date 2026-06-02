@@ -118,7 +118,11 @@ function listenMessages() {
         ${m.reply ? `↩ ${m.reply.sender}: ${m.reply.text}<br>` : ""}
         <b>${m.name}</b><br>
         ${m.text}
-        ${m.reaction ? `<div> ${m.reaction} </div>` : ""}
+        ${m.reaction ? `
+          <div class="reaction">
+            ${m.reaction}
+          </div>
+` : ""}
         ${m.edited ? "<br><small>(düzenlendi)</small>" : ""}
       `;
 
