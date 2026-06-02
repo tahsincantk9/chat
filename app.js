@@ -137,14 +137,14 @@ function listenMessages() {
           <div class="reaction">
             ${m.reaction}
           </div>
-        ` : ""}
-      `;
+      ` : ""}
+
+  ${m.edited ? `<br><small>(düzenlendi)</small>` : ""}
 
   ${(m.name === name || isAdmin) ? `
     <button onclick="deleteMsg('${id}')">🗑</button>
   ` : ""}
-
-`;
+`; 
         ${m.edited ? "<br><small>(düzenlendi)</small>" : ""}
       `;
 
