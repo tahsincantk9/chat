@@ -130,14 +130,21 @@ function listenMessages() {
       });
 
       div.innerHTML = `
-        ${m.reply ? `↩ ${m.reply.sender}: ${m.reply.text}<br>` : ""}
-        <b>${m.name}</b><br>
-        ${m.text}
-        ${m.reaction ? `
-          <div class="reaction">
-            ${m.reaction}
-          </div>
-` : ""}
+  
+      <b>${m.name}</b><br>
+      ${m.text}
+
+      ${m.reaction ? `
+        <div class="reaction">
+          ${m.reaction}
+        </div>
+      ` : ""}
+
+  ${(m.name === name || isAdmin) ? `
+    <button onclick="deleteMsg('${id}')">🗑</button>
+  ` : ""}
+
+`;
         ${m.edited ? "<br><small>(düzenlendi)</small>" : ""}
       `;
 
