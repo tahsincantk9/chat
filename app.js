@@ -213,30 +213,22 @@ function listenTyping() {
 /* ---------------- DELETE ---------------- */
 window.deleteMsg = function(id){
 
-  get(
-    ref(db,`rooms/${roomId}/messages/${id}`)
-  ).then(snap=>{
+  get(ref(db, `rooms/${roomId}/messages/${id}`)).then(snap => {
 
     const m = snap.val();
 
     if(!m) return;
 
-    if(
-      m.name !== name &&
-      !isAdmin
-    ){
-      alert("Yetkin yok");
+    // sadece mesaj sahibi veya admin silebilir
+    if(m.name !== name && !isAdmin){
+      alert("Bu mesajı silemezsin");
       return;
     }
 
-    set(
-      ref(db,`rooms/${roomId}/messages/${id}`),
-      null
-    );
-
+    set(ref(db, `rooms/${roomId}/messages/${id}`), null);
   });
-
 };
+
 
 /* ---------------- HIDE ---------------- */
 window.hideMsg = function (id) {
