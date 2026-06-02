@@ -9,6 +9,7 @@ import {
   get
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
+/* ---------------- FIREBASE ---------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyBZNpGv5Yk54JFB_5U6Qr6iNx2PaPrhIFo",
   authDomain: "party-hub-90183.firebaseapp.com",
@@ -19,6 +20,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+/* ---------------- STATE ---------------- */
 let name = "";
 let roomId = "";
 let replyMessage = null;
@@ -56,24 +58,17 @@ window.sendMessage = function () {
   const msg = document.getElementById("msg").value;
   if (!msg) return;
 
-const now = Date.now();
+  const now = Date.now();
 
-if(now - lastMessageTime < 1500){
-  alert("Çok hızlı mesaj gönderiyorsun");
-  return;
-}
+  if (now - lastMessageTime < 1500) return alert("Çok hızlı!");
+  if (msg.length > 500) return alert("Max 500 karakter");
 
-if(msg.length > 500){
-  alert("Mesaj en fazla 500 karakter olabilir");
-  return;
-}
-
-lastMessageTime = now;
+  lastMessageTime = now;
 
   push(ref(db, `rooms/${roomId}/messages`), {
     name,
     text: msg,
-    time: Date.now(),
+    time: now,
     reply: replyMessage
   });
 
@@ -104,49 +99,34 @@ function listenMessages() {
       let startX = 0;
       let pressTimer;
 
-      /* LONG PRESS */
       div.addEventListener("touchstart", (e) => {
-
         startX = e.touches[0].clientX;
 
         pressTimer = setTimeout(() => {
           showMsgMenu(id, m);
         }, 500);
-
       });
 
-      div.addEventListener("touchend", () => {
-        clearTimeout(pressTimer);
-      });
+      div.addEventListener("touchend", () => clearTimeout(pressTimer));
 
-      /* SWIPE REPLY */
       div.addEventListener("touchmove", (e) => {
-
         let diff = e.touches[0].clientX - startX;
-
-        if (diff > 80) {
-          replyMsg(id, m);
-        }
+        if (diff > 80) replyMsg(id, m);
       });
 
       div.innerHTML = `
         <b>${m.name}</b><br>
         ${m.text}
 
-        ${m.reaction ? `
-          <div class="reaction">
-            ${m.reaction}
-          </div>
-         ` : ""}
+        ${m.reply ? `<small>↩ ${m.reply.sender}: ${m.reply.text}</small><br>` : ""}
 
-        ${m.edited ? `<br><small>(düzenlendi)</small>` : ""}
+        ${m.reaction ? `<div class="reaction">${m.reaction}</div>` : ""}
+
+        ${m.edited ? `<small>(düzenlendi)</small><br>` : ""}
 
         ${(m.name === name || isAdmin) ? `
           <button onclick="deleteMsg('${id}')">🗑</button>
-      ` : ""}
-     `;
-
-          ${m.edited ? "<br><small>(düzenlendi)</small>" : ""}
+        ` : ""}
       `;
 
       box.appendChild(div);
@@ -165,7 +145,6 @@ function setOnline() {
 
 function listenUsers() {
   onValue(ref(db, `rooms/${roomId}/users`), (snap) => {
-
     const box = document.getElementById("users");
     box.innerHTML = "";
 
@@ -180,11 +159,9 @@ function listenUsers() {
 
 /* ---------------- TYPING ---------------- */
 function listenTyping() {
-
   const input = document.getElementById("msg");
 
   input.addEventListener("input", () => {
-
     set(ref(db, `rooms/${roomId}/typing/${name}`), { typing: true });
 
     setTimeout(() => {
@@ -194,49 +171,37 @@ function listenTyping() {
 }
 
 /* ---------------- REPLY ---------------- */
-  window.replyMsg = function(id,m){
+window.replyMsg = function (id, m) {
 
   replyMessage = {
-    sender:m.name,
-    text:m.text
+    sender: m.name,
+    text: m.text
   };
 
   document.getElementById("replyBar").innerHTML = `
-    <span>
-      ↩ ${m.name}: ${m.text}
-    </span>
-
-    <button onclick="cancelReply()">
-      ❌
-    </button>
+    ↩ ${m.name}: ${m.text}
+    <button onclick="cancelReply()">❌</button>
   `;
-    window.cancelReply = function(){
-
-  replyMessage = null;
-
-  document.getElementById("replyBar").innerHTML = "";
 };
+
+window.cancelReply = function () {
+  replyMessage = null;
+  document.getElementById("replyBar").innerHTML = "";
 };
 
 /* ---------------- DELETE ---------------- */
-window.deleteMsg = function(id){
+window.deleteMsg = function (id) {
 
   get(ref(db, `rooms/${roomId}/messages/${id}`)).then(snap => {
 
     const m = snap.val();
+    if (!m) return;
 
-    if(!m) return;
-
-    // sadece mesaj sahibi veya admin silebilir
-    if(m.name !== name && !isAdmin){
-      alert("Bu mesajı silemezsin");
-      return;
-    }
+    if (m.name !== name && !isAdmin) return alert("Yetki yok");
 
     set(ref(db, `rooms/${roomId}/messages/${id}`), null);
   });
 };
-
 
 /* ---------------- HIDE ---------------- */
 window.hideMsg = function (id) {
@@ -244,26 +209,17 @@ window.hideMsg = function (id) {
   if (el) el.style.display = "none";
 };
 
-window.reactMsg = function(id,emoji){
+/* ---------------- REACT ---------------- */
+window.reactMsg = function (id, emoji) {
 
-  const reactionRef =
-    ref(db,`rooms/${roomId}/messages/${id}/reaction`);
+  const r = ref(db, `rooms/${roomId}/messages/${id}/reaction`);
 
-  get(reactionRef).then(s=>{
-
-    const current = s.val();
-
-    if(current === emoji){
-      set(reactionRef,null);
-    }else{
-      set(reactionRef,emoji);
-    }
-
+  get(r).then(s => {
+    set(r, s.val() === emoji ? null : emoji);
   });
-
 };
 
-/* ---------------- SWIPE MENU ---------------- */
+/* ---------------- MENU ---------------- */
 window.showMsgMenu = function (id, m) {
 
   const menu = document.createElement("div");
@@ -281,20 +237,15 @@ window.showMsgMenu = function (id, m) {
   `;
 
   menu.innerHTML = `
-  <button onclick="replyMsg('${id}',msgObj)">↩</button>
-  <button onclick="hideMsg('${id}')">👁</button>
-
-  <button onclick="reactMsg('${id}','❤️')">❤️</button>
-  <button onclick="reactMsg('${id}','😂')">😂</button>
-  <button onclick="reactMsg('${id}','🔥')">🔥</button>
-
-${isAdmin ? `
-<button onclick="deleteMsg('${id}')">🗑</button>
-` : ""}
-`;
+    <button onclick='replyMsg("${id}", ${JSON.stringify(m)})'>↩</button>
+    <button onclick="hideMsg('${id}')">👁</button>
+    <button onclick="reactMsg('${id}','❤️')">❤️</button>
+    <button onclick="reactMsg('${id}','😂')">😂</button>
+    <button onclick="reactMsg('${id}','🔥')">🔥</button>
+    ${isAdmin ? `<button onclick="deleteMsg('${id}')">🗑</button>` : ""}
+  `;
 
   document.body.appendChild(menu);
-
   setTimeout(() => menu.remove(), 3000);
 };
 
@@ -332,33 +283,6 @@ function showAdminPanel() {
 
     for (let room in data) {
 
-      const messages = data[room].messages;
-
-if(messages){
-
-  for(let id in messages){
-
-    const m = messages[id];
-
-    panel.innerHTML += `
-      <div style="
-      border:1px solid #333;
-      margin:5px;
-      padding:5px;
-      ">
-        <b>${m.name}</b><br>
-        ${m.text}<br>
-
-        <button onclick="
-        adminDelete('${room}','${id}')
-        ">
-        🗑
-        </button>
-      </div>
-    `;
-  }
-}
-
       panel.innerHTML += `
         <h4>${room}</h4>
         <button onclick="closeRoom('${room}')">❌ Kapat</button>
@@ -368,17 +292,8 @@ if(messages){
   });
 }
 
-/* ---------------- ROOM CLOSE ---------------- */
+/* ---------------- CLOSE ROOM ---------------- */
 window.closeRoom = function (room) {
   if (!confirm("Oda kapatılsın mı?")) return;
   set(ref(db, `rooms/${room}`), null);
 };
-window.adminDelete = function(room,id){
-
-  set(
-    ref(db,`rooms/${room}/messages/${id}`),
-    null
-  );
-
-};
-
