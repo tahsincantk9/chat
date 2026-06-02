@@ -183,7 +183,7 @@ button {
   height: 100vh;
   display: flex;
   flex-direction: column;
-
+}
 html,
 body{
   width:100%;
