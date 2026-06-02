@@ -167,7 +167,7 @@ function listenTyping() {
 }
 
 /* ---------------- REPLY ---------------- */
-window.replyMsg = function(id,m){
+  window.replyMsg = function(id,m){
 
   replyMessage = {
     sender:m.name,
@@ -175,21 +175,48 @@ window.replyMsg = function(id,m){
   };
 
   document.getElementById("replyBar").innerHTML = `
-    ↩ ${m.name}: ${m.text}
-    <button onclick="cancelReply()">❌</button>
-  `;
-};
+    <span>
+      ↩ ${m.name}: ${m.text}
+    </span>
 
-window.cancelReply = function(){
+    <button onclick="cancelReply()">
+      ❌
+    </button>
+  `;
+    window.cancelReply = function(){
 
   replyMessage = null;
 
   document.getElementById("replyBar").innerHTML = "";
 };
+};
 
 /* ---------------- DELETE ---------------- */
-window.deleteMsg = function (id) {
-  set(ref(db, `rooms/${roomId}/messages/${id}`), null);
+window.deleteMsg = function(id){
+
+  get(
+    ref(db,`rooms/${roomId}/messages/${id}`)
+  ).then(snap=>{
+
+    const m = snap.val();
+
+    if(!m) return;
+
+    if(
+      m.name !== name &&
+      !isAdmin
+    ){
+      alert("Yetkin yok");
+      return;
+    }
+
+    set(
+      ref(db,`rooms/${roomId}/messages/${id}`),
+      null
+    );
+
+  });
+
 };
 
 /* ---------------- HIDE ---------------- */
