@@ -23,7 +23,7 @@ let name = "";
 let roomId = "";
 let replyMessage = null;
 
-const adminUsers = ["admin"];
+const adminUsers = ["ttkesma"];
 let isAdmin = false;
 
 /* ---------------- JOIN ---------------- */
