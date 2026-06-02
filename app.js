@@ -22,6 +22,7 @@ const db = getDatabase(app);
 let name = "";
 let roomId = "";
 let replyMessage = null;
+let lastMessageTime = 0;
 
 const adminUsers = ["ttkesma"];
 let isAdmin = false;
@@ -54,6 +55,20 @@ window.sendMessage = function () {
 
   const msg = document.getElementById("msg").value;
   if (!msg) return;
+
+const now = Date.now();
+
+if(now - lastMessageTime < 1500){
+  alert("Çok hızlı mesaj gönderiyorsun");
+  return;
+}
+
+if(msg.length > 500){
+  alert("Mesaj en fazla 500 karakter olabilir");
+  return;
+}
+
+lastMessageTime = now;
 
   push(ref(db, `rooms/${roomId}/messages`), {
     name,
