@@ -118,6 +118,7 @@ function listenMessages() {
         ${m.reply ? `↩ ${m.reply.sender}: ${m.reply.text}<br>` : ""}
         <b>${m.name}</b><br>
         ${m.text}
+        ${m.reaction ? `<div> ${m.reaction} </div>` : ""}
         ${m.edited ? "<br><small>(düzenlendi)</small>" : ""}
       `;
 
@@ -166,15 +167,24 @@ function listenTyping() {
 }
 
 /* ---------------- REPLY ---------------- */
-window.replyMsg = function (id, m) {
+window.replyMsg = function(id,m){
 
   replyMessage = {
-    sender: m.name,
-    text: m.text
+    sender:m.name,
+    text:m.text
   };
 
-  document.getElementById("replyBar").innerText =
-    "↩ " + m.name + ": " + m.text;
+  document.getElementById("replyBar").innerHTML = `
+    ↩ ${m.name}: ${m.text}
+    <button onclick="cancelReply()">❌</button>
+  `;
+};
+
+window.cancelReply = function(){
+
+  replyMessage = null;
+
+  document.getElementById("replyBar").innerHTML = "";
 };
 
 /* ---------------- DELETE ---------------- */
@@ -186,6 +196,25 @@ window.deleteMsg = function (id) {
 window.hideMsg = function (id) {
   const el = document.querySelector(`[data-id="${id}"]`);
   if (el) el.style.display = "none";
+};
+
+window.reactMsg = function(id,emoji){
+
+  const reactionRef =
+    ref(db,`rooms/${roomId}/messages/${id}/reaction`);
+
+  get(reactionRef).then(s=>{
+
+    const current = s.val();
+
+    if(current === emoji){
+      set(reactionRef,null);
+    }else{
+      set(reactionRef,emoji);
+    }
+
+  });
+
 };
 
 /* ---------------- SWIPE MENU ---------------- */
@@ -206,10 +235,17 @@ window.showMsgMenu = function (id, m) {
   `;
 
   menu.innerHTML = `
-    <button onclick="deleteMsg('${id}')">🗑</button>
-    <button onclick="hideMsg('${id}')">👁</button>
-    <button onclick="replyMsg('${id}', ${JSON.stringify(m).replace(/"/g,'&quot;')})">↩</button>
-  `;
+  <button onclick="replyMsg('${id}',msgObj)">↩</button>
+  <button onclick="hideMsg('${id}')">👁</button>
+
+  <button onclick="reactMsg('${id}','❤️')">❤️</button>
+  <button onclick="reactMsg('${id}','😂')">😂</button>
+  <button onclick="reactMsg('${id}','🔥')">🔥</button>
+
+${isAdmin ? `
+<button onclick="deleteMsg('${id}')">🗑</button>
+` : ""}
+`;
 
   document.body.appendChild(menu);
 
@@ -250,6 +286,33 @@ function showAdminPanel() {
 
     for (let room in data) {
 
+      const messages = data[room].messages;
+
+if(messages){
+
+  for(let id in messages){
+
+    const m = messages[id];
+
+    panel.innerHTML += `
+      <div style="
+      border:1px solid #333;
+      margin:5px;
+      padding:5px;
+      ">
+        <b>${m.name}</b><br>
+        ${m.text}<br>
+
+        <button onclick="
+        adminDelete('${room}','${id}')
+        ">
+        🗑
+        </button>
+      </div>
+    `;
+  }
+}
+
       panel.innerHTML += `
         <h4>${room}</h4>
         <button onclick="closeRoom('${room}')">❌ Kapat</button>
@@ -264,3 +327,12 @@ window.closeRoom = function (room) {
   if (!confirm("Oda kapatılsın mı?")) return;
   set(ref(db, `rooms/${room}`), null);
 };
+window.adminDelete = function(room,id){
+
+  set(
+    ref(db,`rooms/${room}/messages/${id}`),
+    null
+  );
+
+};
+
